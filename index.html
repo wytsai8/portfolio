@@ -60,12 +60,19 @@
         section {
             flex: 0 0 100vw;
             height: 100vh;
-            padding: 80px 8% 40px; /* Balanced padding */
+            padding: 120px 8% 40px; /* Increased top padding for navbar */
             scroll-snap-align: start;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Center content vertically */
+            justify-content: flex-start; /* Start from top vertically */
+            align-items: center; /* Center content horizontally */
             overflow-y: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto; /* Ensure container itself is centered */
         }
 
         section::-webkit-scrollbar { width: 6px; }
@@ -105,9 +112,11 @@
 
         .container { max-width: 1200px; margin: 0 auto; width: 100%; }
 
-        /* --- Hero --- */
+        /* --- Centered Sections --- */
+        #home, #about, #contact {
+            justify-content: center;
+        }
         #home {
-            justify-content: center; /* Center content vertically */
             text-align: center;
         }
 
@@ -144,9 +153,30 @@
 
         @keyframes float { from { transform: translateY(0); } to { transform: translateY(-5px); } }
 
-        .pub-list { list-style: none; padding: 0; margin-top: 10px; border-top: 1px solid #f0f0f0; padding-top: 10px; }
-        .pub-item { font-size: 0.8rem; color: #777; margin-bottom: 8px; line-height: 1.4; }
-        .pub-title { font-style: italic; color: #444; }
+        /* --- Experience UI Refinement --- */
+        .pub-list { 
+            list-style: none; 
+            padding: 0; 
+            margin-top: 20px; 
+            display: grid;
+            gap: 12px;
+        }
+        .pub-item { 
+            font-size: 0.82rem; 
+            color: #555; 
+            line-height: 1.5;
+            background: rgba(199, 206, 234, 0.15); /* Soft Lavender tint */
+            padding: 12px 18px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-lavender);
+            transition: all 0.3s ease;
+        }
+        .pub-item:hover {
+            background: rgba(199, 206, 234, 0.25);
+            transform: translateX(5px);
+        }
+        .pub-title { font-style: italic; color: #333; font-weight: 500; }
+        .pub-journal { font-weight: 700; color: #5a6496; }
 
         .contact-form { background: var(--glass-bg); padding: 35px; border-radius: 30px; border: 1px solid var(--glass-border); }
         .submit-btn { background: var(--accent-mint); border: none; padding: 15px 40px; border-radius: 50px; font-weight: 700; cursor: pointer; }
@@ -290,6 +320,7 @@
 
         <section id="works">
             <div class="container">
+                <h2 class="section-title">Portfolio</h2>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
                     <div class="work-card">
                         <div style="font-size: 3rem; margin-bottom: 20px;">🧬</div>
@@ -311,70 +342,101 @@
         </section>
 
         <section id="experience">
-            <div class="container" style="max-width: 900px;">
-                <h2 class="section-title">Professional Journey</h2>
-                <div style="position: relative; padding: 20px 0;">
-                    <div style="position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--accent-lavender), var(--accent-mint), var(--accent-apricot));"></div>
+            <div class="container" style="max-width: 1000px; padding-top: 20px;">
+                <h2 class="section-title" style="margin-bottom: 60px;">Professional Journey</h2>
+                
+                <div style="position: relative;">
+                    <div style="position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--accent-lavender), var(--accent-mint), var(--accent-apricot)); opacity: 0.5;"></div>
                     
                     <!-- TUM -->
-                    <div style="position: relative; margin-bottom: 40px; padding-left: 60px;">
+                    <div style="position: relative; margin-bottom: 60px; padding-left: 60px;">
                         <div style="position: absolute; left: 11px; top: 0; width: 20px; height: 20px; background: white; border: 4px solid var(--accent-lavender); border-radius: 50%; z-index: 2;"></div>
-                        <div style="background: white; padding: 25px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #f0f0f0;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <div style="background: white; padding: 30px; border-radius: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); border: 1px solid #f0f0f0;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                                 <div>
-                                    <h3 style="font-size: 1.25rem;">PhD Researcher</h3>
-                                    <p style="color: #888; font-size: 0.9rem;">Technical University of Munich, Germany</p>
+                                    <h3 style="font-size: 1.4rem; color: #333;">PhD Researcher</h3>
+                                    <p style="color: #888; font-weight: 500;">Technical University of Munich, Germany</p>
                                 </div>
-                                <span style="background: #f0f2f8; color: #5a6496; padding: 5px 15px; border-radius: 12px; font-size: 0.8rem; font-weight: 800;">2017 - 2026</span>
+                                <span style="background: #f0f2f8; color: #5a6496; padding: 6px 18px; border-radius: 15px; font-size: 0.85rem; font-weight: 800;">2017 - 2026</span>
                             </div>
-                            <div style="display: grid; gap: 20px; font-size: 0.95rem; color: #555;">
+                            
+                            <div style="display: grid; gap: 30px; font-size: 0.95rem; color: #555;">
                                 <div>
-                                    <p style="font-weight: 800; color: #3a7a6a; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 8px;">Alzheimer’s Biomarker Discovery</p>
-                                    <p><strong>Responsibility:</strong> Developing computational pipelines for stratification.<br>
-                                    <strong>Technology:</strong> Python, ML (Random Forest, SVM), R/Bioconductor.<br>
-                                    <strong>Outcome:</strong> Identified novel signatures achieving <strong>90% accuracy</strong>.</p>
-                                    <ul class="pub-list">
-                                        <li class="pub-item">1. <span class="pub-title">Multi-Platform Integration of Brain and CSF Proteomes</span>. Briefings in Bioinformatics. 2026.</li>
-                                    </ul>
+                                    <p style="font-weight: 800; color: #3a7a6a; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Alzheimer’s Biomarker Discovery</p>
+                                    <div style="margin-bottom: 15px; line-height: 1.7;">
+                                        <strong>Responsibility:</strong> Developing computational pipelines for patient stratification.<br>
+                                        <strong>Technology:</strong> Python, ML (Random Forest, SVM), R/Bioconductor.<br>
+                                        <strong>Data:</strong> Multi-modal proteomics & longitudinal clinical datasets.<br>
+                                        <strong>Outcome:</strong> Identified novel signatures achieving <strong>90% accuracy</strong>.
+                                    </div>
+                                    <div class="pub-list">
+                                        <div class="pub-item">
+                                            1. <span class="pub-title">Multi-Platform Integration of Brain and CSF Proteomes Reveals Biomarker Panels for Alzheimer’s Disease</span>. <span class="pub-journal">Briefings in Bioinformatics</span>. 2026.
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
-                                    <p style="font-weight: 800; color: #5a6496; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 8px;">Biomedical Signal Processing</p>
-                                    <p><strong>Responsibility:</strong> Computational modeling of imaging signals.<br>
-                                    <strong>Technology:</strong> Signal Processing (FFT), Regression, MATLAB.<br>
-                                    <strong>Outcome:</strong> Achieved <strong>>80% prediction accuracy</strong> for indicators.</p>
-                                    <ul class="pub-list">
-                                        <li class="pub-item">2. <span class="pub-title">Photoacoustic and absorption spectroscopy imaging analysis</span>. PLoS One. 2023.</li>
-                                    </ul>
+                                    <p style="font-weight: 800; color: #5a6496; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Biomedical Signal Processing</p>
+                                    <div style="margin-bottom: 15px; line-height: 1.7;">
+                                        <strong>Responsibility:</strong> Computational modeling of imaging signals for parameter prediction.<br>
+                                        <strong>Technology:</strong> Signal Processing (FFT), MATLAB, Regression.<br>
+                                        <strong>Data:</strong> Photoacoustic imaging & biochemical lab measurements.<br>
+                                        <strong>Outcome:</strong> Achieved <strong>>80% prediction accuracy</strong> for indicators.
+                                    </div>
+                                    <div class="pub-list">
+                                        <div class="pub-item">
+                                            2. <span class="pub-title">Photoacoustic and absorption spectroscopy imaging analysis of human blood</span>. <span class="pub-journal">PLoS One</span>. 2023.
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div style="margin-top: 15px; padding: 10px 15px; background: #fffcfc; border-radius: 12px; font-size: 0.85rem; color: #b85c5c; font-style: italic;">
+                            <div style="margin-top: 25px; padding: 12px 20px; background: #fffcfc; border-radius: 15px; font-size: 0.85rem; color: #b85c5c; font-style: italic; border: 1px dashed #ffdada;">
                                 Full-time parenting periods: 2022-2023 and 2024-2025
                             </div>
                         </div>
                     </div>
 
                     <!-- NHRI -->
-                    <div style="position: relative; margin-bottom: 40px; padding-left: 60px;">
+                    <div style="position: relative; margin-bottom: 60px; padding-left: 60px;">
                         <div style="position: absolute; left: 11px; top: 0; width: 20px; height: 20px; background: white; border: 4px solid var(--accent-mint); border-radius: 50%; z-index: 2;"></div>
-                        <div style="background: white; padding: 25px 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #f0f0f0;">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <div style="background: white; padding: 30px; border-radius: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); border: 1px solid #f0f0f0;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                                 <div>
-                                    <h3 style="font-size: 1.25rem;">Research Assistant</h3>
-                                    <p style="color: #888; font-size: 0.9rem;">National Health Research Institutes, Taiwan</p>
+                                    <h3 style="font-size: 1.4rem; color: #333;">Research Assistant</h3>
+                                    <p style="color: #888; font-weight: 500;">National Health Research Institutes, Taiwan</p>
                                 </div>
-                                <span style="background: #f0f8f5; color: #3a7a6a; padding: 5px 15px; border-radius: 12px; font-size: 0.8rem; font-weight: 800;">2013 - 2017</span>
+                                <span style="background: #f0f8f5; color: #3a7a6a; padding: 6px 18px; border-radius: 15px; font-size: 0.85rem; font-weight: 800;">2013 - 2017</span>
                             </div>
-                            <p style="font-size: 0.95rem; color: #555;">
-                                <strong>Outcome:</strong> Developed <strong>FamPipe</strong> and <strong>SeqSIMLA2</strong> for NGS automation.
-                            </p>
-                            <ul class="pub-list">
-                                <li class="pub-item">3. <span class="pub-title">FamPipe: Automatic Analysis Pipeline for Families</span>. PLoS Comput Biol. 2016.</li>
-                                <li class="pub-item">4. <span class="pub-title">A combined association test for rare variants</span>. BMC Proc. 2016.</li>
-                                <li class="pub-item">5. <span class="pub-title">SeqSIMLA2: simulating correlated quantitative traits</span>. Genet Epidemiol. 2015.</li>
-                                <li class="pub-item">6. <span class="pub-title">Family-based association test using sequencing data</span>. PLoS One. 2014.</li>
-                            </ul>
+                            <div style="margin-bottom: 20px; line-height: 1.7; color: #555;">
+                                <strong>Responsibility:</strong> Designing statistical methods and bioinformatics tools for complex genetic data analysis.<br>
+                                <strong>Technology:</strong> Python, R, C++, Shell Scripting, Parallel Computing.<br>
+                                <strong>Data:</strong> Large-scale Next-Generation Sequencing (NGS) data, family-based studies.<br>
+                                <strong>Outcome:</strong> Developed <strong>FamPipe</strong> and <strong>SeqSIMLA2</strong> for automation and rare variant detection.
+                            </div>
+                            <div class="pub-list">
+                                <div class="pub-item">3. <span class="pub-title">FamPipe: An Automatic Analysis Pipeline for Families</span>. <span class="pub-journal">PLoS Comput Biol</span>. 2016.</div>
+                                <div class="pub-item">4. <span class="pub-title">A combined association test for rare variants</span>. <span class="pub-journal">BMC Proc</span>. 2016.</div>
+                                <div class="pub-item">5. <span class="pub-title">SeqSIMLA2: simulating correlated quantitative traits</span>. <span class="pub-journal">Genet Epidemiol</span>. 2015.</div>
+                                <div class="pub-item">6. <span class="pub-title">Family-based association test using sequencing data</span>. <span class="pub-journal">PLoS One</span>. 2014.</div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- ITRI -->
+                    <div style="position: relative; padding-left: 60px;">
+                        <div style="position: absolute; left: 11px; top: 0; width: 20px; height: 20px; background: white; border: 4px solid var(--accent-apricot); border-radius: 50%; z-index: 2;"></div>
+                        <div style="background: white; padding: 30px; border-radius: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); border: 1px solid #f0f0f0;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                                <div>
+                                    <h3 style="font-size: 1.4rem; color: #333;">Intern</h3>
+                                    <p style="color: #888; font-weight: 500;">Industrial Technology Research Institute, Taiwan</p>
+                                </div>
+                                <span style="background: #fff8f4; color: #b85c5c; padding: 5px 15px; border-radius: 12px; font-size: 0.8rem; font-weight: 800;">2010 - 2011</span>
+                            </div>
+                            <p style="font-size: 0.95rem; color: #555;">Designed and implemented protein docking workflows using <strong>Schrödinger</strong> and <strong>KNIME</strong> for drug discovery pipelines.</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
