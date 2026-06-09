@@ -31,9 +31,9 @@
         <div style="text-align: center; margin: 30px 0;"><img src="AD.png" style="width: 100%; max-width: 1000px; border-radius: 15px;"></div>
         <div class="dashboard-container">
             <div class="controls-grid">
-                <div><label>TISSUE</label><select id="sel-tissue" class="custom-select" onchange="updatePlots()"><option value="Brain">Brain Tissue</option><option value="CSF">CSF</option></select></div>
-                <div><label>PLATFORM</label><select id="sel-platform" class="custom-select" onchange="updatePlots()"><option value="TMT">TMT</option><option value="LFQ">LFQ</option><option value="PEA">PEA</option></select></div>
-                <div><label>MODEL</label><select id="sel-model" class="custom-select" onchange="updatePlots()"><option value="RF">Random Forest</option><option value="LR">Logistic Regression</option></select></div>
+                <div><label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">TISSUE</label><select id="sel-tissue" class="custom-select" onchange="updatePlots()"><option value="Brain">Brain Tissue</option><option value="CSF">CSF</option></select></div>
+                <div><label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">PROTEIN PANELS</label><select id="sel-platform" class="custom-select" onchange="updatePlots()"><option value="TMT">TMT</option><option value="LFQ">LFQ</option><option value="PEA">PEA</option></select></div>
+                <div><label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">MODEL</label><select id="sel-model" class="custom-select" onchange="updatePlots()"><option value="RF">Random Forest</option><option value="LR">Logistic Regression</option></select></div>
             </div>
             <div class="plots-grid">
                 <div class="plot-card"><div id="status-shap" class="status-overlay"><div class="spinner"></div><div id="msg-shap">Loading...</div></div><div id="plot-shap" class="plot-container"></div></div>
@@ -54,10 +54,12 @@
                 if (!resTMT.ok || !resSHAP.ok) throw new Error("Data files missing on server.");
                 const txtTMT = await resTMT.text(); const txtSHAP = await resSHAP.text();
 
-                // Darker Colors for Directionality
-                const cUp = '#d32f2f'; const cDown = '#388e3c'; const cNS = '#bdbdbd';
+                // Professional Color Palette (No Red)
+                const cUp = '#1565c0';    // Royal Blue (Up-regulated)
+                const cDown = '#2e7d32';  // Forest Green (Down-regulated)
+                const cNS = '#bdbdbd';    // Grey
 
-                // 1. Parse Volcano Data (No significance threshold)
+                // 1. Parse Volcano Data
                 const linesTMT = txtTMT.split(/\r?\n/).filter(l => l.trim());
                 const headTMT = linesTMT[0].split('\t');
                 const gIdx = headTMT.findIndex(h => h.toLowerCase().includes('gene'));
@@ -70,14 +72,13 @@
                     const fc = parseFloat(c[lIdx]); const p = parseFloat(c[pIdx]);
                     if (!isNaN(fc)) {
                         const gene = c[gIdx]?.trim() || "Unknown";
-                        // Color purely based on LogFC direction (Up/Down)
                         let color = fc > 0 ? cUp : (fc < 0 ? cDown : cNS);
                         vData.push({ gene, fc, lp: -Math.log10(p || 1), color });
                         g2c[gene] = color;
                     }
                 });
 
-                // 2. Parse SHAP Data (Directly use pre-calculated values)
+                // 2. Parse SHAP Data
                 const linesSHAP = txtSHAP.split(/\r?\n/).filter(l => l.trim());
                 let shapResults = [];
                 linesSHAP.slice(1).forEach(line => {
@@ -85,9 +86,7 @@
                     if (c.length >= 2) {
                         const gene = c[0].trim();
                         const val = parseFloat(c[1]);
-                        if (!isNaN(val)) {
-                            shapResults.push({ gene, val, color: g2c[gene] || cNS });
-                        }
+                        if (!isNaN(val)) shapResults.push({ gene, val, color: g2c[gene] || cNS });
                     }
                 });
                 shapResults.sort((a, b) => b.val - a.val);
@@ -104,10 +103,10 @@
                     yaxis: { automargin: true }, margin: { l: 90, r: 30, t: 50, b: 50 }, plot_bgcolor: 'white'
                 }, {displayModeBar: false});
 
-                // 4. Render Volcano Plot (Removed significance lines/filtering)
+                // 4. Render Volcano Plot
                 Plotly.newPlot('plot-volcano', [{
                     x: vData.map(d => d.fc), y: vData.map(d => d.lp), text: vData.map(d => d.gene),
-                    mode: 'markers', marker: { color: vData.map(d => d.color), size: 6, opacity: 0.7 },
+                    mode: 'markers', marker: { color: vData.map(d => d.color), size: 6, opacity: 0.75 },
                     hovertemplate: '<b>%{text}</b><br>Log2FC: %{x:.2f}<br>-Log10 P: %{y:.2f}<extra></extra>'
                 }], {
                     title: { text: 'Volcano Plot: Brain TMT', font: {size: 14} },
