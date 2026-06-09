@@ -330,24 +330,33 @@
         </section>
 
         <section id="works">
-            <div class="container">
-                <h2 class="section-title">Portfolio</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
-                    <div class="work-card">
-                        <div style="font-size: 3rem; margin-bottom: 20px;">🧬</div>
-                        <h3 style="margin-bottom: 15px;">Novel Biomarker Discovery for Alzheimer's Disease</h3>
-                        <p style="font-size: 0.95rem; color: #666; line-height: 1.6;">A cross-platform study integrating brain and CSF proteomes to identify stable biomarker panels for early diagnosis.</p>
-                    </div>
-                    <div class="work-card">
-                        <div style="font-size: 3rem; margin-bottom: 20px;">🔬</div>
-                        <h3 style="margin-bottom: 15px;">Biomedical Signal Analytics</h3>
+            <div class="container" style="max-width: 1000px;">
+                <h2 class="section-title" style="margin-bottom: 50px;">Portfolio</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                    
+                    <!-- Featured Project (Full Width) -->
+                    <a href="project1.html" style="grid-column: 1 / -1; background: white; padding: 45px 50px; border-radius: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 40px; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 25px 50px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.04)';">
+                        <div style="font-size: 5rem; flex-shrink: 0; background: #f0f8f5; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; border-radius: 30px; box-shadow: inset 0 0 20px rgba(181, 234, 215, 0.3);">🧠</div>
+                        <div>
+                            <div style="color: #3a7a6a; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Featured Research</div>
+                            <h3 style="font-size: 1.6rem; margin-bottom: 15px; color: #333;">Novel Biomarker Discovery for Alzheimer's Disease</h3>
+                            <p style="font-size: 1.05rem; color: #666; line-height: 1.7;">A cross-platform study integrating brain and cerebrospinal fluid (CSF) proteomes to identify robust and stable biomarker panels for early diagnosis and patient stratification.</p>
+                        </div>
+                    </a>
+
+                    <!-- Project 2 (Half Width) -->
+                    <a href="project2.html" style="background: white; padding: 40px; border-radius: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 25px 50px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.04)';">
+                        <div style="font-size: 4rem; margin-bottom: 25px; background: #f0f2f8; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; border-radius: 25px; box-shadow: inset 0 0 20px rgba(199, 206, 234, 0.3);">📟</div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 15px; color: #333;">Biomedical Signal Analytics</h3>
                         <p style="font-size: 0.95rem; color: #666; line-height: 1.6;">Modeling photoacoustic imaging signals to predict biochemical parameters in human blood samples.</p>
-                    </div>
-                    <div class="work-card">
-                        <div style="font-size: 3rem; margin-bottom: 20px;">📊</div>
-                        <h3 style="margin-bottom: 15px;">FamPipe & SeqSIMLA2</h3>
+                    </a>
+
+                    <!-- Project 3 (Half Width) -->
+                    <a href="project3.html" style="background: white; padding: 40px; border-radius: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; text-align: center; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 25px 50px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 15px 40px rgba(0,0,0,0.04)';">
+                        <div style="font-size: 4rem; margin-bottom: 25px; background: #fff8f4; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; border-radius: 25px; box-shadow: inset 0 0 20px rgba(255, 218, 193, 0.4);">👨‍👩‍👧‍👦</div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 15px; color: #333;">FamPipe & SeqSIMLA2</h3>
                         <p style="font-size: 0.95rem; color: #666; line-height: 1.6;">Development of automated NGS pipelines and simulation tools for family-based genetic association studies.</p>
-                    </div>
+                    </a>
                 </div>
             </div>
         </section>
@@ -492,11 +501,32 @@
     </div>
 
     <script>
+        // Handle instant snap for back navigation (e.g., returning from project pages)
+        document.addEventListener("DOMContentLoaded", () => {
+            if (window.location.hash) {
+                const targetElement = document.querySelector(window.location.hash);
+                const wrapper = document.querySelector('.horizontal-wrapper');
+                if (targetElement && wrapper) {
+                    // Instantly jump to the section without animation
+                    wrapper.style.scrollBehavior = 'auto';
+                    wrapper.scrollTo({ left: targetElement.offsetLeft, behavior: 'instant' });
+                    
+                    // Re-enable smooth scrolling for future interactions
+                    setTimeout(() => {
+                        wrapper.style.scrollBehavior = 'smooth';
+                    }, 50);
+                }
+            }
+        });
+
+        // Smooth horizontal scrolling for navigation links
         document.querySelectorAll('.nav-links a, .btn').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 const href = this.getAttribute('href');
                 if (href.startsWith('#')) {
                     e.preventDefault();
+                    // Update URL so manual refresh/back works correctly
+                    history.pushState(null, null, href); 
                     const targetElement = document.querySelector(href);
                     const wrapper = document.querySelector('.horizontal-wrapper');
                     if (targetElement && wrapper) {
