@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novel Biomarker Discovery | Project Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            color: #4a4a4a;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        h1 { font-family: 'Montserrat', sans-serif; color: #333; margin-bottom: 10px; }
+        .back-btn {
+            display: inline-block; margin-bottom: 30px; text-decoration: none; color: #3a7a6a; font-weight: 600; transition: color 0.3s;
+        }
+        .back-btn:hover { color: #222; }
+        .interactive-area {
+            width: 100%;
+            height: 600px;
+            background: #f0f2f8;
+            border: 2px dashed #c7ceea;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5a6496;
+            font-weight: 600;
+            margin-top: 30px;
+        }
+
+        /* --- Dashboard Styles --- */
+        .dashboard-container {
+            margin-top: 60px;
+            background: #fafbfc;
+            border: 1px solid #eef0f5;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        }
+        .dashboard-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .control-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .custom-select {
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: white;
+            font-size: 1rem;
+            color: #333;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .custom-select:focus {
+            border-color: #b5ead7;
+            box-shadow: 0 0 0 3px rgba(181, 234, 215, 0.3);
+        }
+        .plots-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 768px) {
+            .plots-grid { grid-template-columns: 1fr; }
+        }
+        .plot-card {
+            background: white;
+            border-radius: 15px;
+            border: 1px solid #eee;
+            padding: 30px 20px;
+            height: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+        .plot-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        .plot-title {
+            font-weight: 700;
+            color: #444;
+            margin-bottom: 10px;
+        }
+        .plot-desc {
+            font-size: 0.9rem;
+            color: #888;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+        .loading-spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3a7a6a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html#works" class="back-btn">← Back to Portfolio</a>
+        <h1>Novel Biomarker Discovery for Alzheimer's Disease</h1>
+        <p>A cross-platform study integrating brain and CSF proteomes to identify stable biomarker panels for early diagnosis.</p>
+        
+        <div class="interactive-area" style="background: none; border: none; height: auto;">
+            <img src="AD.png" alt="Alzheimer's Biomarker Analysis" style="width: 100%; height: auto; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+
+        <!-- Interactive Dashboard Prototype -->
+        <div class="dashboard-container">
+            <h2 class="dashboard-title">Interactive Model Explorer</h2>
+            
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label class="control-label">Tissue Source</label>
+                    <select id="sel-tissue" class="custom-select" onchange="updatePlots()">
+                        <option value="Brain">Brain Tissue</option>
+                        <option value="CSF">Cerebrospinal Fluid (CSF)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Proteomics Platform</label>
+                    <select id="sel-platform" class="custom-select" onchange="updatePlots()">
+                        <option value="TMT">TMT (Tandem Mass Tag)</option>
+                        <option value="LFQ">LFQ (Label-Free Quantitation)</option>
+                        <option value="PEA">PEA (Proximity Extension Assay)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Machine Learning Model</label>
+                    <select id="sel-model" class="custom-select" onchange="updatePlots()">
+                        <option value="RF">Random Forest (RF)</option>
+                        <option value="LR">Logistic Regression (LR)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="plots-grid">
+                <!-- SHAP Plot Area -->
+                <div class="plot-card" id="card-shap">
+                    <div class="loading-spinner" id="spin-shap"></div>
+                    <div id="content-shap" style="width: 100%;">
+                        <div class="plot-icon">📊</div>
+                        <div class="plot-title">SHAP Feature Importance</div>
+                        <div class="plot-desc">Select parameters above to simulate loading top predictive protein markers.</div>
+                    </div>
+                </div>
+
+                <!-- Volcano Plot Area -->
+                <div class="plot-card" id="card-volcano">
+                    <div class="loading-spinner" id="spin-volcano"></div>
+                    <div id="content-volcano" style="width: 100%;">
+                        <div class="plot-icon">🌋</div>
+                        <div class="plot-title">Volcano Plot Alignment</div>
+                        <div class="plot-desc">Select parameters to view differential expression distribution for the top features.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function updatePlots() {
+            const tissue = document.getElementById('sel-tissue').value;
+            const platform = document.getElementById('sel-platform').value;
+            const model = document.getElementById('sel-model').value;
+            
+            const shapCard = document.getElementById('content-shap');
+            const volcanoCard = document.getElementById('content-volcano');
+            const spinShap = document.getElementById('spin-shap');
+            const spinVolcano = document.getElementById('spin-volcano');
+
+            // Show loading animation
+            shapCard.style.display = 'none';
+            volcanoCard.style.display = 'none';
+            spinShap.style.display = 'block';
+            spinVolcano.style.display = 'block';
+
+            // 1. Simulate SHAP update (Static for now, can be replaced with real data later)
+            setTimeout(() => {
+                spinShap.style.display = 'none';
+                shapCard.style.display = 'block';
+                shapCard.innerHTML = `
+                    <div style="color: #3a7a6a; font-weight: 800; font-size: 1.2rem; margin-bottom: 5px;">Top ${model} Predictors</div>
+                    <div style="font-size: 0.9rem; color: #888; margin-bottom: 20px;">[ ${tissue} | ${platform} Panels ]</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 80%; margin: 0 auto;">
+                        <div style="display: flex; align-items: center; gap: 10px;"><div style="flex: 1; text-align: right; font-size: 0.8rem; color: #555; font-weight: 600;">MAPT</div><div style="height: 14px; background: #ffb7b2; width: 90%; border-radius: 6px; box-shadow: 0 2px 5px rgba(255,183,178,0.5);"></div></div>
+                        <div style="display: flex; align-items: center; gap: 10px;"><div style="flex: 1; text-align: right; font-size: 0.8rem; color: #555; font-weight: 600;">APOE</div><div style="height: 14px; background: #ffb7b2; width: 75%; border-radius: 6px; box-shadow: 0 2px 5px rgba(255,183,178,0.5);"></div></div>
+                        <div style="display: flex; align-items: center; gap: 10px;"><div style="flex: 1; text-align: right; font-size: 0.8rem; color: #555; font-weight: 600;">GFAP</div><div style="height: 14px; background: #b5ead7; width: 55%; border-radius: 6px;"></div></div>
+                        <div style="display: flex; align-items: center; gap: 10px;"><div style="flex: 1; text-align: right; font-size: 0.8rem; color: #555; font-weight: 600;">YKL40</div><div style="height: 14px; background: #b5ead7; width: 40%; border-radius: 6px;"></div></div>
+                        <div style="display: flex; align-items: center; gap: 10px;"><div style="flex: 1; text-align: right; font-size: 0.8rem; color: #555; font-weight: 600;">NFL</div><div style="height: 14px; background: #c7ceea; width: 25%; border-radius: 6px;"></div></div>
+                    </div>
+                    <p style="font-size: 0.75rem; color: #999; margin-top: 25px;">*SHAP value magnitude (Impact on model output)</p>
+                `;
+            }, 600);
+
+            // 2. Real/Simulated Volcano Plot Logic
+            try {
+                if (tissue === 'Brain' && platform === 'TMT') {
+                    // Fetch real data
+                    const response = await fetch('TMT_brain.txt');
+                    if (!response.ok) throw new Error("File not found or CORS issue");
+                    const data = await response.text();
+                    
+                    const rows = data.split('\\n').slice(1); // skip header
+                    let x = [], y = [], text = [], colors = [];
+                    
+                    rows.forEach(row => {
+                        const cols = row.split('\\t');
+                        if (cols.length >= 4) {
+                            const gene = cols[0];
+                            const logFC = parseFloat(cols[2]);
+                            const pValue = parseFloat(cols[3]);
+                            
+                            if (!isNaN(logFC) && !isNaN(pValue) && pValue > 0) {
+                                const negLogP = -Math.log10(pValue);
+                                x.push(logFC);
+                                y.push(negLogP);
+                                text.push(gene);
+                                
+                                // Color logic
+                                if (negLogP > 1.3 && logFC > 0.1) colors.push('#ffb7b2'); // Up (Red/Pink)
+                                else if (negLogP > 1.3 && logFC < -0.1) colors.push('#b5ead7'); // Down (Mint)
+                                else colors.push('#e0e0e0'); // Not significant
+                            }
+                        }
+                    });
+
+                    spinVolcano.style.display = 'none';
+                    volcanoCard.style.display = 'block';
+                    volcanoCard.innerHTML = `<div id="plotly-volcano" style="width: 100%; height: 350px;"></div>`;
+                    
+                    const trace = {
+                        x: x,
+                        y: y,
+                        text: text,
+                        mode: 'markers',
+                        type: 'scatter',
+                        marker: { color: colors, size: 6, opacity: 0.7 },
+                        hovertemplate: '<b>%{text}</b><br>Log2FC: %{x:.2f}<br>-Log10 P: %{y:.2f}<extra></extra>'
+                    };
+
+                    const layout = {
+                        title: { text: 'Volcano Plot: Brain TMT', font: {size: 14, color: '#5a6496'} },
+                        xaxis: { title: 'Log2 Fold Change', zeroline: true },
+                        yaxis: { title: '-Log10 p-value' },
+                        margin: { l: 50, r: 20, t: 40, b: 40 },
+                        hovermode: 'closest'
+                    };
+
+                    Plotly.newPlot('plotly-volcano', [trace], layout, {displayModeBar: false});
+                } else {
+                    // Fallback simulated plot for combinations without real files yet
+                    setTimeout(() => {
+                        spinVolcano.style.display = 'none';
+                        volcanoCard.style.display = 'block';
+                        volcanoCard.innerHTML = `
+                            <div style="color: #5a6496; font-weight: 800; font-size: 1.2rem; margin-bottom: 5px;">Expression Alignment</div>
+                            <div style="font-size: 0.9rem; color: #888; margin-bottom: 20px;">[ ${tissue} | ${platform} ] Simulated Data</div>
+                            <div style="padding: 20px; background: #fffcfc; border: 1px dashed #ffb7b2; border-radius: 10px; font-size: 0.9rem; color: #b85c5c;">
+                                ⚠️ No real dataset provided for ${tissue} + ${platform}.<br>Please upload corresponding .txt files to enable interactivity for this combination.
+                            </div>
+                        `;
+                    }, 600);
+                }
+            } catch (err) {
+                // Handle CORS errors (when opened via file://)
+                spinVolcano.style.display = 'none';
+                volcanoCard.style.display = 'block';
+                volcanoCard.innerHTML = `
+                    <div style="color: #5a6496; font-weight: 800; font-size: 1.2rem; margin-bottom: 5px;">Expression Alignment</div>
+                    <div style="padding: 20px; background: #fff3f3; border: 1px dashed #d9534f; border-radius: 10px; font-size: 0.9rem; color: #d9534f;">
+                        Local Security Restriction (CORS).<br>To view the real Plotly graph from TMT_brain.txt, please host this file on GitHub Pages or run a local web server.
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize on load
+        window.onload = updatePlots;
+    </script>
+</body>
+</html>
