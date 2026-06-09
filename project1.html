@@ -288,28 +288,31 @@
 
                     // Extract top 15 genes by significance for the Bar Plot (simulating RF Importance)
                     const sortedData = [...volcanoData].sort((a, b) => b.negLogP - a.negLogP);
-                    const topGenes = sortedData.slice(0, 15).reverse(); // Reverse so top is at top of bar chart
+                    const topGenes = sortedData.slice(0, 15); // Highest significance first
                     
-                    const barY = topGenes.map(d => d.gene);
-                    // Simulate Importance score descending based on negLogP ranking
-                    const barX = topGenes.map((d, i) => 0.1 + (i * 0.05)); 
-                    const barColor = topGenes.map(d => d.color === '#e0e0e0' ? '#c7ceea' : d.color);
+                    const barX_genes = topGenes.map(d => d.gene);
+                    // Simulate SHAP mean(|SHAP value|) descending
+                    const barY_vals = topGenes.map((d, i) => 0.15 - (i * 0.008) - Math.random() * 0.002); 
+                    const barColor = '#ff0052'; // Uniform SHAP red/pink color
 
                     // 1. Render Bar Plot (Top Predictors)
                     shapCard.innerHTML = `<div id="plotly-shap" style="width: 100%; height: 350px;"></div>`;
                     const barTrace = {
-                        x: barX,
-                        y: barY,
+                        x: barX_genes,
+                        y: barY_vals,
                         type: 'bar',
-                        orientation: 'h',
                         marker: { color: barColor },
-                        hovertemplate: '<b>%{y}</b><br>Importance Score: %{x:.2f}<extra></extra>'
+                        hovertemplate: '<b>%{x}</b><extra></extra>' // Do not show Importance score
                     };
                     const barLayout = {
-                        title: { text: `Top ${model} Predictors (Simulated Importance)<br><span style="font-size:10px; color:#888;">[ ${tissue} | ${platform} Panels ]</span>`, font: {size: 14, color: '#3a7a6a'} },
-                        margin: { l: 80, r: 20, t: 60, b: 40 },
-                        xaxis: { title: 'Mean Decrease Gini (Simulated)', zeroline: false },
-                        yaxis: { title: '' },
+                        title: { text: 'summary barplot feature, Random Forest', font: {size: 13, color: '#333'} },
+                        margin: { l: 60, r: 20, t: 40, b: 60 },
+                        xaxis: { title: '' },
+                        yaxis: { 
+                            title: 'mean(|SHAP value|)', 
+                            zeroline: false,
+                            tickformat: '.2f' 
+                        },
                         plot_bgcolor: 'white'
                     };
                     Plotly.newPlot('plotly-shap', [barTrace], barLayout, {displayModeBar: false});
@@ -336,7 +339,7 @@
 
                     // 3. Add Interactivity: Click Bar -> Highlight Volcano
                     document.getElementById('plotly-shap').on('plotly_click', function(data) {
-                        const clickedGene = data.points[0].y;
+                        const clickedGene = data.points[0].x; // In vertical bar, gene is on X axis
                         
                         // Find gene in volcano data
                         const geneData = volcanoData.find(d => d.gene === clickedGene);
