@@ -214,7 +214,6 @@
             const spinShap = document.getElementById('spin-shap');
             const spinVolcano = document.getElementById('spin-volcano');
 
-            // Show loading animation
             shapCard.style.display = 'none';
             volcanoCard.style.display = 'none';
             spinShap.style.display = 'block';
@@ -222,7 +221,6 @@
 
             try {
                 if (tissue === 'Brain' && platform === 'TMT') {
-                    // Fetch real data
                     console.log("Fetching TMT_brain.txt and SHAP_TMT_brain.txt...");
                     const [resTMT, resSHAP] = await Promise.all([
                         fetch('TMT_brain.txt'),
@@ -237,7 +235,7 @@
                     // Parse TMT_brain.txt
                     const rowsTMT = dataTMT.split(/\r?\n/).filter(row => row.trim().length > 0);
                     const headersTMT = rowsTMT[0].split('\t');
-                    const geneIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'gene name' || h.trim().toLowerCase() === 'gene' || h.trim().toLowerCase() === 'symbol');
+                    const geneIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'gene name' || h.trim().toLowerCase() === 'gene');
                     const uniIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'uniprot id' || h.trim().toLowerCase() === 'uniprot');
                     const logFCIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'logfc' || h.trim().toLowerCase() === 'log2fc');
                     const pValIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'p.value' || h.trim().toLowerCase() === 'pvalue');
@@ -265,19 +263,19 @@
                                 else if (negLogP > 1.3 && logFC < -0.1) color = '#b5ead7';
                                 
                                 volcanoData.push({ gene, logFC, negLogP, color });
-                                if (uniprot) uniprotToGene[uniprot] = gene;
+                                if (uniprot) uniprotToGene[uniprot] = gene.trim();
                             }
                         }
                     }
 
                     // Parse SHAP_TMT_brain.txt
                     const rowsSHAP = dataSHAP.split(/\r?\n/).filter(row => row.trim().length > 0);
-                    const headersSHAP = rowsSHAP[0].split('\t').slice(1);
+                    const headersSHAP = rowsSHAP[0].split('\t').slice(1); // skip empty index col
 
                     let shapSums = new Array(headersSHAP.length).fill(0);
                     let rowCount = 0;
                     for (let i = 1; i < rowsSHAP.length; i++) {
-                        const cols = rowsSHAP[i].split('\t').slice(1);
+                        const cols = rowsSHAP[i].split('\t').slice(1); // skip index
                         if (cols.length === headersSHAP.length) {
                             for (let j = 0; j < cols.length; j++) {
                                 shapSums[j] += Math.abs(parseFloat(cols[j]));
@@ -303,37 +301,29 @@
                     shapCard.style.display = 'block';
                     volcanoCard.style.display = 'block';
 
-                    if (volcanoData.length === 0 || shapFeatures.length === 0) {
-                        shapCard.innerHTML = `<div style="padding: 20px; color: #d9534f;">Error parsing data.</div>`;
-                        volcanoCard.innerHTML = `<div style="padding: 20px; color: #d9534f;">Error parsing data.</div>`;
-                        return;
-                    }
-
-                    // Render Bar Plot (Real SHAP Data)
+                    // Render Horizontal Bar Plot (Matches Summary Plot style)
                     const topGenes = shapFeatures.slice(0, 15);
-                    const barX_genes = topGenes.map(d => d.gene); // For vertical, no need to reverse
-                    const barY_vals = topGenes.map(d => d.meanShap);
+                    const barY_genes = topGenes.map(d => d.gene).reverse(); // Reverse for bottom-to-top layout
+                    const barX_vals = topGenes.map(d => d.meanShap).reverse();
                     
                     shapCard.innerHTML = `<div id="plotly-shap" style="width: 100%; height: 350px;"></div>`;
                     const barTrace = {
-                        x: barX_genes,
-                        y: barY_vals,
+                        x: barX_vals,
+                        y: barY_genes,
                         type: 'bar',
+                        orientation: 'h',
                         marker: { color: '#ff0052' },
-                        hovertemplate: '<b>%{x}</b><br>mean(|SHAP value|): %{y:.4f}<extra></extra>' 
+                        hovertemplate: '<b>%{y}</b><br>mean(|SHAP value|): %{x:.4f}<extra></extra>' 
                     };
                     const barLayout = {
-                        title: { text: 'summary barplot feature, Random Forest', font: {size: 13, color: '#333'} },
-                        margin: { l: 60, r: 20, t: 40, b: 60 },
+                        title: { text: 'TMT dataset from the brain tissue', font: {size: 13, color: '#333'} },
+                        margin: { l: 80, r: 20, t: 40, b: 60 },
                         xaxis: { 
-                            title: '',
-                            tickangle: -45 // Angle labels if they are long
-                        },
-                        yaxis: { 
                             title: 'mean(|SHAP value|)', 
                             zeroline: false,
                             tickformat: '.3f' 
                         },
+                        yaxis: { title: '' },
                         plot_bgcolor: 'white'
                     };
                     Plotly.newPlot('plotly-shap', [barTrace], barLayout, {displayModeBar: false});
