@@ -12,11 +12,14 @@
         h1 { font-family: 'Montserrat', sans-serif; color: #333; margin-bottom: 10px; }
         .back-btn { display: inline-block; margin-bottom: 30px; text-decoration: none; color: #3a7a6a; font-weight: 600; transition: color 0.3s; }
         .back-btn:hover { color: #222; }
+        
         .dashboard-container { margin-top: 40px; background: #fafbfc; border: 1px solid #eef0f5; border-radius: 20px; padding: 30px; }
+        .group-title { font-size: 1rem; font-weight: 800; color: #333; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #3a7a6a; display: inline-block; padding-bottom: 5px; }
         .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .custom-select { padding: 12px; border-radius: 10px; border: 1px solid #ddd; width: 100%; font-size: 0.95rem; }
         .plots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
         @media (max-width: 1000px) { .plots-grid { grid-template-columns: 1fr; } }
+        
         .plot-card { background: white; border-radius: 15px; border: 1px solid #eee; padding: 15px; min-height: 420px; position: relative; display: flex; flex-direction: column; }
         .plot-container { width: 100%; height: 380px; }
         .status-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 5; flex-direction: column; text-align: center; padding: 20px; }
@@ -29,10 +32,12 @@
         <a href="index.html#works" class="back-btn">← Back to Portfolio</a>
         <h1>Novel Biomarker Discovery for Alzheimer's Disease</h1>
         <div style="text-align: center; margin: 30px 0;"><img src="AD.png" style="width: 100%; max-width: 1000px; border-radius: 15px;"></div>
+        
         <div class="dashboard-container">
+            <h3 class="group-title">Protein Panels</h3>
             <div class="controls-grid">
                 <div><label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">TISSUE</label><select id="sel-tissue" class="custom-select" onchange="updatePlots()"><option value="Brain">Brain Tissue</option><option value="CSF">CSF</option></select></div>
-                <div><label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">PROTEIN PANELS</label><select id="sel-platform" class="custom-select" onchange="updatePlots()"><option value="TMT">TMT</option><option value="LFQ">LFQ</option><option value="PEA">PEA</option></select></div>
+                <div><label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">PLATFORM</label><select id="sel-platform" class="custom-select" onchange="updatePlots()"><option value="TMT">TMT</option><option value="LFQ">LFQ</option><option value="PEA">PEA</option></select></div>
                 <div><label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">MODEL</label><select id="sel-model" class="custom-select" onchange="updatePlots()"><option value="RF">Random Forest</option><option value="LR">Logistic Regression</option></select></div>
             </div>
             <div class="plots-grid">
@@ -45,19 +50,32 @@
         async function updatePlots() {
             const tissue = document.getElementById('sel-tissue').value;
             const platform = document.getElementById('sel-platform').value;
+            const model = document.getElementById('sel-model').value;
             const sShap = document.getElementById('status-shap'); const sVol = document.getElementById('status-volcano');
             const mShap = document.getElementById('msg-shap'); const mVol = document.getElementById('msg-volcano');
             sShap.style.display = 'flex'; sVol.style.display = 'flex';
-            try {
-                if (tissue !== 'Brain' || platform !== 'TMT') throw new Error("Real data is only available for Brain Tissue + TMT.");
-                const [resTMT, resSHAP] = await Promise.all([fetch('TMT_brain.txt'), fetch('SHAP_TMT_brain.txt')]);
-                if (!resTMT.ok || !resSHAP.ok) throw new Error("Data files missing on server.");
-                const txtTMT = await resTMT.text(); const txtSHAP = await resSHAP.text();
 
-                // Professional Color Palette (No Red)
-                const cUp = '#1565c0';    // Royal Blue (Up-regulated)
-                const cDown = '#2e7d32';  // Forest Green (Down-regulated)
-                const cNS = '#bdbdbd';    // Grey
+            try {
+                // Determine Volcano File
+                let vFile = "";
+                if (tissue==='Brain' && platform==='TMT') vFile = 'TMT_brain.txt';
+                else if (tissue==='Brain' && platform==='LFQ') vFile = 'LFQ_brain.txt';
+                else if (tissue==='CSF' && platform==='TMT') vFile = 'TMT_CSF.txt';
+                else if (tissue==='CSF' && platform==='PEA') vFile = 'PEA_CSF.txt';
+
+                if (!vFile) throw new Error("Data for this combination is not yet available.");
+
+                // Fetch Files (Only TMT Brain has real SHAP for now)
+                let fetchTasks = [fetch(vFile)];
+                if (tissue==='Brain' && platform==='TMT') fetchTasks.push(fetch('SHAP_TMT_brain.txt'));
+                
+                const responses = await Promise.all(fetchTasks);
+                if (!responses[0].ok) throw new Error(`Could not load ${vFile}`);
+
+                const txtTMT = await responses[0].text();
+                let txtSHAP = (responses[1] && responses[1].ok) ? await responses[1].text() : null;
+
+                const cUp = '#1565c0'; const cDown = '#2e7d32'; const cNS = '#bdbdbd';
 
                 // 1. Parse Volcano Data
                 const linesTMT = txtTMT.split(/\r?\n/).filter(l => l.trim());
@@ -78,51 +96,58 @@
                     }
                 });
 
-                // 2. Parse SHAP Data
-                const linesSHAP = txtSHAP.split(/\r?\n/).filter(l => l.trim());
+                // 2. Parse SHAP Data if available
                 let shapResults = [];
-                linesSHAP.slice(1).forEach(line => {
-                    const c = line.split('\t');
-                    if (c.length >= 2) {
-                        const gene = c[0].trim();
-                        const val = parseFloat(c[1]);
-                        if (!isNaN(val)) shapResults.push({ gene, val, color: g2c[gene] || cNS });
-                    }
-                });
-                shapResults.sort((a, b) => b.val - a.val);
+                if (txtSHAP) {
+                    const linesSHAP = txtSHAP.split(/\r?\n/).filter(l => l.trim());
+                    linesSHAP.slice(1).forEach(line => {
+                        const c = line.split('\t');
+                        if (c.length >= 2) {
+                            const gene = c[0].trim(); const val = parseFloat(c[1]);
+                            if (!isNaN(val)) shapResults.push({ gene, val, color: g2c[gene] || cNS });
+                        }
+                    });
+                    shapResults.sort((a, b) => b.val - a.val);
+                }
 
-                // 3. Render Bar Plot
-                const topN = shapResults.slice(0, 15);
-                Plotly.newPlot('plot-shap', [{
-                    x: topN.map(d => d.val).reverse(), y: topN.map(d => d.gene).reverse(),
-                    type: 'bar', orientation: 'h', marker: { color: topN.map(d => d.color).reverse() },
-                    hovertemplate: '<b>%{y}</b><extra></extra>'
-                }], {
-                    title: { text: 'Overall Feature Importance Based on SHAP Values', font: {size: 13, color: '#333'} },
-                    xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f' },
-                    yaxis: { automargin: true }, margin: { l: 90, r: 30, t: 50, b: 50 }, plot_bgcolor: 'white'
-                }, {displayModeBar: false});
+                // 3. Render Plots
+                if (shapResults.length > 0) {
+                    const topN = shapResults.slice(0, 15);
+                    Plotly.newPlot('plot-shap', [{
+                        x: topN.map(d => d.val).reverse(), y: topN.map(d => d.gene).reverse(),
+                        type: 'bar', orientation: 'h', marker: { color: topN.map(d => d.color).reverse() },
+                        hovertemplate: '<b>%{y}</b><extra></extra>'
+                    }], {
+                        title: { text: 'Overall Feature Importance Based on SHAP Values', font: {size: 11} },
+                        xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f' },
+                        yaxis: { automargin: true }, margin: { l: 80, r: 20, t: 40, b: 40 }, plot_bgcolor: 'white'
+                    }, {displayModeBar: false});
+                    sShap.style.display = 'none';
+                } else {
+                    mShap.innerText = "SHAP data for this panel is currently being calculated.";
+                }
 
-                // 4. Render Volcano Plot
                 Plotly.newPlot('plot-volcano', [{
                     x: vData.map(d => d.fc), y: vData.map(d => d.lp), text: vData.map(d => d.gene),
                     mode: 'markers', marker: { color: vData.map(d => d.color), size: 6, opacity: 0.75 },
                     hovertemplate: '<b>%{text}</b><br>Log2FC: %{x:.2f}<br>-Log10 P: %{y:.2f}<extra></extra>'
                 }], {
-                    title: { text: 'Volcano Plot: Brain TMT', font: {size: 14} },
+                    title: { text: `Volcano Plot: ${tissue} ${platform}`, font: {size: 13} },
                     xaxis: { title: 'Log2 Fold Change', zeroline: true, zerolinecolor: '#999' },
                     yaxis: { title: '-Log10 p-value' },
-                    margin: { l: 50, r: 20, t: 50, b: 50 }, hovermode: 'closest'
+                    margin: { l: 50, r: 20, t: 40, b: 40 }, hovermode: 'closest'
                 }, {displayModeBar: false});
+                sVol.style.display = 'none';
 
+                // Interaction
                 document.getElementById('plot-shap').on('plotly_click', (data) => {
                     const g = data.points[0].y; const d = vData.find(v => v.gene === g);
                     if (d) Plotly.relayout('plot-volcano', { annotations: [{ x: d.fc, y: d.lp, xref: 'x', yref: 'y', text: `<b>${d.gene}</b>`, showarrow: true, arrowhead: 2, ax: 40, ay: -40, font: { color: '#fff' }, bgcolor: '#333', borderpad: 4 }] });
                 });
-                sShap.style.display = 'none'; sVol.style.display = 'none';
+
             } catch (err) {
-                mShap.innerHTML = `<span style="color:#d32f2f">Error: ${err.message}</span>`;
-                sVol.style.display = 'none'; console.error(err);
+                mShap.innerText = err.message; mVol.innerText = "Check dataset selection.";
+                console.error(err);
             }
         }
         window.onload = updatePlots;
