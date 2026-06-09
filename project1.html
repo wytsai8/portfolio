@@ -173,7 +173,7 @@
                 <div class="plot-card" id="card-shap">
                     <div class="loading-spinner" id="spin-shap"></div>
                     <div id="content-shap" style="width: 100%;">
-                        <div class="plot-title">Overall Feature Importance Based on SHAP Values</div>
+                        <div id="plotly-shap" style="width: 100%; height: 350px;"></div>
                     </div>
                 </div>
 
@@ -181,7 +181,7 @@
                 <div class="plot-card" id="card-volcano">
                     <div class="loading-spinner" id="spin-volcano"></div>
                     <div id="content-volcano" style="width: 100%;">
-                        <div class="plot-title">Volcano Plot Alignment</div>
+                        <div id="plotly-volcano" style="width: 100%; height: 350px;"></div>
                     </div>
                 </div>
             </div>
@@ -217,11 +217,10 @@
                     const dataSHAP = await resSHAP.text();
                     
                     // Volcano Colors (Darker versions)
-                    const colorUp = '#d9534f'; // Darker Red
-                    const colorDown = '#2e7d32'; // Darker Green
-                    const colorNS = '#cccccc'; // Grey
+                    const colorUp = '#d9534f'; 
+                    const colorDown = '#2e7d32'; 
+                    const colorNS = '#cccccc';
 
-                    // Parse TMT_brain.txt
                     const rowsTMT = dataTMT.split(/\r?\n/).filter(row => row.trim().length > 0);
                     const headersTMT = rowsTMT[0].split('\t');
                     const gIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'gene name' || h.trim().toLowerCase() === 'gene');
@@ -254,7 +253,6 @@
                         }
                     }
 
-                    // Parse SHAP_TMT_brain.txt
                     const rowsSHAP = dataSHAP.split(/\r?\n/).filter(row => row.trim().length > 0);
                     const headersSHAP = rowsSHAP[0].split('\t').slice(1);
 
@@ -287,20 +285,18 @@
                     shapCard.style.display = 'block';
                     volcanoCard.style.display = 'block';
 
-                    // 1. Render Bar Plot
                     const topGenes = shapFeatures.slice(0, 15);
                     const barY_genes = topGenes.map(d => d.gene).reverse();
                     const barX_vals = topGenes.map(d => d.meanShap).reverse();
                     const barColors = topGenes.map(d => d.color).reverse();
                     
-                    shapCard.innerHTML = `<div id="plotly-shap" style="width: 100%; height: 350px;"></div>`;
                     const barTrace = {
                         x: barX_vals,
                         y: barY_genes,
                         type: 'bar',
                         orientation: 'h',
                         marker: { color: barColors },
-                        hovertemplate: '<b>%{y}</b><extra></extra>' // No numeric value shown
+                        hovertemplate: '<b>%{y}</b><extra></extra>'
                     };
                     const barLayout = {
                         title: { text: 'Overall Feature Importance Based on SHAP Values', font: {size: 12, color: '#333'} },
@@ -311,13 +307,11 @@
                     };
                     Plotly.newPlot('plotly-shap', [barTrace], barLayout, {displayModeBar: false});
 
-                    // 2. Render Volcano Plot
                     const vX = volcanoData.map(d => d.logFC);
                     const vY = volcanoData.map(d => d.negLogP);
                     const vText = volcanoData.map(d => d.gene);
                     const vColor = volcanoData.map(d => d.color);
 
-                    volcanoCard.innerHTML = `<div id="plotly-volcano" style="width: 100%; height: 350px;"></div>`;
                     const volTrace = {
                         x: vX,
                         y: vY,
@@ -336,7 +330,6 @@
                     };
                     Plotly.newPlot('plotly-volcano', [volTrace], volLayout, {displayModeBar: false});
 
-                    // Interactivity
                     document.getElementById('plotly-shap').on('plotly_click', function(data) {
                         const clickedGene = data.points[0].y; 
                         const geneData = volcanoData.find(d => d.gene === clickedGene);
