@@ -27,164 +27,104 @@
             display: inline-block; margin-bottom: 30px; text-decoration: none; color: #3a7a6a; font-weight: 600; transition: color 0.3s;
         }
         .back-btn:hover { color: #222; }
-        .interactive-area {
-            width: 100%;
-            height: auto;
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        /* --- Dashboard Styles --- */
+        
         .dashboard-container {
-            margin-top: 60px;
+            margin-top: 40px;
             background: #fafbfc;
             border: 1px solid #eef0f5;
             border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-        }
-        .dashboard-title {
-            font-size: 1.5rem;
-            color: #333;
-            margin-bottom: 30px;
-            text-align: center;
-            font-family: 'Montserrat', sans-serif;
+            padding: 30px;
         }
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-bottom: 40px;
-        }
-        .control-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .control-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #666;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-bottom: 30px;
         }
         .custom-select {
-            padding: 12px 15px;
+            padding: 12px;
             border-radius: 10px;
             border: 1px solid #ddd;
-            background: white;
-            font-size: 1rem;
-            color: #333;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s;
-        }
-        .custom-select:focus {
-            border-color: #b5ead7;
-            box-shadow: 0 0 0 3px rgba(181, 234, 215, 0.3);
+            width: 100%;
+            font-size: 0.95rem;
         }
         .plots-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            gap: 25px;
         }
-        @media (max-width: 900px) {
-            .plots-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 1000px) { .plots-grid { grid-template-columns: 1fr; } }
+        
         .plot-card {
             background: white;
             border-radius: 15px;
             border: 1px solid #eee;
-            padding: 20px;
-            min-height: 400px;
+            padding: 15px;
+            min-height: 420px;
+            position: relative;
             display: flex;
             flex-direction: column;
-            position: relative;
         }
-        .plot-container {
-            width: 100%;
-            height: 380px;
+        .plot-container { width: 100%; height: 380px; }
+        
+        .status-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 5; border-radius: 15px;
+            flex-direction: column; text-align: center; padding: 20px;
         }
-        .loading-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            border-radius: 15px;
-        }
-        .loading-spinner {
-            width: 40px; height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3a7a6a;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #f3f3f3;
+            border-top: 4px solid #3a7a6a; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 10px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .error-message {
-            padding: 20px;
-            color: #d9534f;
-            text-align: center;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <a href="index.html#works" class="back-btn">← Back to Portfolio</a>
         <h1>Novel Biomarker Discovery for Alzheimer's Disease</h1>
-        <p>A cross-platform study integrating brain and CSF proteomes to identify stable biomarker panels for early diagnosis.</p>
         
-        <div class="interactive-area">
-            <img src="AD.png" alt="Alzheimer's Biomarker Analysis" style="width: 100%; height: auto; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.08);">
+        <div style="text-align: center; margin: 30px 0;">
+            <img src="AD.png" alt="AD Analysis" style="width: 100%; max-width: 1000px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
         </div>
 
         <div class="dashboard-container">
-            <h2 class="dashboard-title">Interactive Model Explorer</h2>
-            
             <div class="controls-grid">
-                <div class="control-group">
-                    <label class="control-label">Tissue Source</label>
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">TISSUE</label>
                     <select id="sel-tissue" class="custom-select" onchange="updatePlots()">
                         <option value="Brain">Brain Tissue</option>
-                        <option value="CSF">Cerebrospinal Fluid (CSF)</option>
+                        <option value="CSF">CSF</option>
                     </select>
                 </div>
-                <div class="control-group">
-                    <label class="control-label">Proteomics Platform</label>
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">PLATFORM</label>
                     <select id="sel-platform" class="custom-select" onchange="updatePlots()">
-                        <option value="TMT">TMT (Tandem Mass Tag)</option>
-                        <option value="LFQ">LFQ (Label-Free Quantitation)</option>
-                        <option value="PEA">PEA (Proximity Extension Assay)</option>
+                        <option value="TMT">TMT</option>
+                        <option value="LFQ">LFQ</option>
+                        <option value="PEA">PEA</option>
                     </select>
                 </div>
-                <div class="control-group">
-                    <label class="control-label">Machine Learning Model</label>
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">MODEL</label>
                     <select id="sel-model" class="custom-select" onchange="updatePlots()">
-                        <option value="RF">Random Forest (RF)</option>
-                        <option value="LR">Logistic Regression (LR)</option>
+                        <option value="RF">Random Forest</option>
+                        <option value="LR">Logistic Regression</option>
                     </select>
                 </div>
             </div>
 
             <div class="plots-grid">
-                <!-- SHAP Plot Area -->
-                <div class="plot-card" id="card-shap">
-                    <div class="loading-overlay" id="loader-shap"><div class="loading-spinner"></div></div>
-                    <div id="plotly-shap" class="plot-container"></div>
-                    <div id="err-shap" class="error-message" style="display:none;"></div>
+                <div class="plot-card">
+                    <div id="status-shap" class="status-overlay"><div class="spinner"></div><div id="msg-shap">Loading...</div></div>
+                    <div id="plot-shap" class="plot-container"></div>
                 </div>
-
-                <!-- Volcano Plot Area -->
-                <div class="plot-card" id="card-volcano">
-                    <div class="loading-overlay" id="loader-volcano"><div class="loading-spinner"></div></div>
-                    <div id="plotly-volcano" class="plot-container"></div>
-                    <div id="err-volcano" class="error-message" style="display:none;"></div>
+                <div class="plot-card">
+                    <div id="status-volcano" class="status-overlay"><div class="spinner"></div><div id="msg-volcano">Loading...</div></div>
+                    <div id="plot-volcano" class="plot-container"></div>
                 </div>
             </div>
         </div>
@@ -194,174 +134,138 @@
         async function updatePlots() {
             const tissue = document.getElementById('sel-tissue').value;
             const platform = document.getElementById('sel-platform').value;
-            const model = document.getElementById('sel-model').value;
             
-            const loaderShap = document.getElementById('loader-shap');
-            const loaderVolcano = document.getElementById('loader-volcano');
-            const errShap = document.getElementById('err-shap');
-            const errVolcano = document.getElementById('err-volcano');
-            const plotShap = document.getElementById('plotly-shap');
-            const plotVolcano = document.getElementById('plotly-volcano');
+            const sShap = document.getElementById('status-shap');
+            const sVol = document.getElementById('status-volcano');
+            const mShap = document.getElementById('msg-shap');
+            const mVol = document.getElementById('msg-volcano');
 
-            // Reset UI
-            loaderShap.style.display = 'flex';
-            loaderVolcano.style.display = 'flex';
-            errShap.style.display = 'none';
-            errVolcano.style.display = 'none';
-            plotShap.style.visibility = 'hidden';
-            plotVolcano.style.visibility = 'hidden';
+            sShap.style.display = 'flex'; sVol.style.display = 'flex';
+            mShap.innerText = "Loading data..."; mVol.innerText = "Loading data...";
 
             try {
                 if (tissue !== 'Brain' || platform !== 'TMT') {
-                    throw new Error(`Data for ${tissue} ${platform} is currently being processed. Please select Brain + TMT to see real results.`);
+                    throw new Error("Detailed results for this combination are coming soon. Select Brain + TMT for the live demo.");
                 }
 
-                // Fetch Files
                 const [resTMT, resSHAP] = await Promise.all([
-                    fetch('TMT_brain.txt').catch(() => null),
-                    fetch('SHAP_TMT_brain.txt').catch(() => null)
+                    fetch('TMT_brain.txt'),
+                    fetch('SHAP_TMT_brain.txt')
                 ]);
 
-                if (!resTMT || !resTMT.ok) throw new Error("Could not find 'TMT_brain.txt'. Please ensure it's uploaded to your GitHub repository.");
-                if (!resSHAP || !resSHAP.ok) throw new Error("Could not find 'SHAP_TMT_brain.txt'. Please ensure it's uploaded to your GitHub repository.");
+                if (!resTMT.ok || !resSHAP.ok) throw new Error("Data files missing on server.");
 
-                const dataTMT = await resTMT.text();
-                const dataSHAP = await resSHAP.text();
+                const txtTMT = await resTMT.text();
+                const txtSHAP = await resSHAP.text();
 
-                // Darker Volcano Colors
-                const colorUp = '#cc3300';    // Deep Red
-                const colorDown = '#1b5e20';  // Deep Green
-                const colorNS = '#b0b0b0';    // Solid Grey
+                // Colors
+                const cUp = '#d32f2f'; const cDown = '#388e3c'; const cNS = '#bdbdbd';
 
-                // 1. Parse Volcano Data (TMT_brain.txt)
-                const rowsTMT = dataTMT.split(/\r?\n/).filter(r => r.trim());
-                const headersTMT = rowsTMT[0].split('\t');
-                const gIdx = headersTMT.findIndex(h => h.trim().toLowerCase().includes('gene'));
-                const uIdx = headersTMT.findIndex(h => h.trim().toLowerCase().includes('uniprot'));
-                const lIdx = headersTMT.findIndex(h => h.trim().toLowerCase().includes('logfc'));
-                const pIdx = headersTMT.findIndex(h => h.trim().toLowerCase().includes('p.value') || h.trim().toLowerCase().includes('pvalue'));
+                // --- 1. Parse TMT (Volcano) ---
+                const linesTMT = txtTMT.split(/\r?\n/).filter(l => l.trim());
+                const headTMT = linesTMT[0].split('\t');
+                const gIdx = headTMT.findIndex(h => h.toLowerCase().includes('gene'));
+                const uIdx = headTMT.findIndex(h => h.toLowerCase().includes('uniprot'));
+                const lIdx = headTMT.findIndex(h => h.toLowerCase().includes('logfc'));
+                const pIdx = headTMT.findIndex(h => h.toLowerCase().includes('p.value') || h.toLowerCase().includes('pvalue'));
 
-                let volcanoData = [];
-                let uniprotToGene = {};
-                let geneToColor = {};
-
-                for (let i = 1; i < rowsTMT.length; i++) {
-                    const cols = rowsTMT[i].split('\t');
-                    if (cols.length > 3) {
-                        const gene = cols[gIdx] ? cols[gIdx].trim() : "Unknown";
-                        const uniprot = cols[uIdx] ? cols[uIdx].trim() : "";
-                        const logFC = parseFloat(cols[lIdx]);
-                        const pValue = parseFloat(cols[pIdx]);
-
-                        if (!isNaN(logFC) && !isNaN(pValue) && pValue > 0) {
-                            const negLogP = -Math.log10(pValue);
-                            let color = colorNS;
-                            if (negLogP > 1.3 && logFC > 0.1) color = colorUp;
-                            else if (negLogP > 1.3 && logFC < -0.1) color = colorDown;
-                            
-                            volcanoData.push({ gene, logFC, negLogP, color });
-                            if (uniprot) uniprotToGene[uniprot] = gene;
-                            geneToColor[gene] = color;
+                let vData = []; let u2g = {}; let g2c = {};
+                for (let i = 1; i < linesTMT.length; i++) {
+                    const c = linesTMT[i].split('\t');
+                    const gene = c[gIdx]?.trim() || "Unknown";
+                    const uni = c[uIdx]?.trim() || "";
+                    const fc = parseFloat(c[lIdx]);
+                    const p = parseFloat(c[pIdx]);
+                    if (!isNaN(fc) && !isNaN(p)) {
+                        let color = cNS;
+                        if (-Math.log10(p) > 1.3) {
+                            if (fc > 0.1) color = cUp;
+                            else if (fc < -0.1) color = cDown;
                         }
+                        vData.push({ gene, fc, lp: -Math.log10(p), color });
+                        if (uni) u2g[uni] = gene;
+                        g2c[gene] = color;
                     }
                 }
 
-                // 2. Parse SHAP Data (SHAP_TMT_brain.txt)
-                const rowsSHAP = dataSHAP.split(/\r?\n/).filter(r => r.trim());
-                const headersSHAP = rowsSHAP[0].split('\t').slice(1); // skip index column
+                // --- 2. Parse SHAP ---
+                const linesSHAP = txtSHAP.split(/\r?\n/).filter(l => l.trim());
+                // Detection: if first cell is empty, first row is headers with leading tab
+                const rawHeadSHAP = linesSHAP[0].split('\t');
+                const hasLeadingTab = rawHeadSHAP[0] === "";
+                const headers = hasLeadingTab ? rawHeadSHAP.slice(1) : rawHeadSHAP;
 
-                let shapSums = new Array(headersSHAP.length).fill(0);
-                let count = 0;
-                for (let i = 1; i < rowsSHAP.length; i++) {
-                    const cols = rowsSHAP[i].split('\t').slice(1);
-                    if (cols.length === headersSHAP.length) {
-                        for (let j = 0; j < cols.length; j++) {
-                            shapSums[j] += Math.abs(parseFloat(cols[j]) || 0);
+                let sums = new Array(headers.length).fill(0);
+                let rowCount = 0;
+                for (let i = 1; i < linesSHAP.length; i++) {
+                    const c = linesSHAP[i].split('\t');
+                    // Data rows usually have index in first col
+                    const vals = c.slice(1); 
+                    if (vals.length >= headers.length) {
+                        for (let j = 0; j < headers.length; j++) {
+                            sums[j] += Math.abs(parseFloat(vals[j]) || 0);
                         }
-                        count++;
+                        rowCount++;
                     }
                 }
 
-                let shapFeatures = [];
-                for (let j = 0; j < headersSHAP.length; j++) {
-                    const uni = headersSHAP[j].trim();
-                    const gene = uniprotToGene[uni] || uni;
-                    shapFeatures.push({
-                        gene: gene,
-                        meanShap: shapSums[j] / count,
-                        color: geneToColor[gene] || colorNS
-                    });
-                }
-                shapFeatures.sort((a, b) => b.meanShap - a.meanShap);
+                let finalShap = headers.map((uni, j) => {
+                    const gene = u2g[uni.trim()] || uni.trim();
+                    return { gene, val: sums[j] / rowCount, color: g2c[gene] || cNS };
+                }).sort((a, b) => b.val - a.val);
 
-                // 3. Render Bar Plot
-                const top15 = shapFeatures.slice(0, 15);
-                const barY = top15.map(d => d.gene).reverse();
-                const barX = top15.map(d => d.meanShap).reverse();
-                const barC = top15.map(d => d.color).reverse();
-
-                const barTrace = {
-                    x: barX, y: barY, type: 'bar', orientation: 'h',
-                    marker: { color: barC },
-                    hovertemplate: '<b>%{y}</b><extra></extra>' // Remove mean value display
-                };
-                const barLayout = {
-                    title: { text: 'Overall Feature Importance Based on SHAP Values', font: {size: 13, color: '#333'} },
-                    margin: { l: 90, r: 20, t: 40, b: 60 },
+                // --- 3. Render ---
+                const top15 = finalShap.slice(0, 15);
+                
+                Plotly.newPlot('plot-shap', [{
+                    x: top15.map(d => d.val).reverse(),
+                    y: top15.map(d => d.gene).reverse(),
+                    type: 'bar', orientation: 'h',
+                    marker: { color: top15.map(d => d.color).reverse() },
+                    hovertemplate: '<b>%{y}</b><extra></extra>'
+                }], {
+                    title: { text: 'Overall Feature Importance Based on SHAP Values', font: {size: 12} },
+                    margin: { l: 80, r: 20, t: 40, b: 40 },
                     xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f' },
-                    yaxis: { title: '' },
+                    yaxis: { automargin: true },
                     plot_bgcolor: 'white'
-                };
-                Plotly.newPlot('plotly-shap', [barTrace], barLayout, {displayModeBar: false});
+                }, {displayModeBar: false});
 
-                // 4. Render Volcano Plot
-                const volTrace = {
-                    x: volcanoData.map(d => d.logFC),
-                    y: volcanoData.map(d => d.negLogP),
-                    text: volcanoData.map(d => d.gene),
-                    mode: 'markers', type: 'scatter',
-                    marker: { color: volcanoData.map(d => d.color), size: 6, opacity: 0.8 },
+                Plotly.newPlot('plot-volcano', [{
+                    x: vData.map(d => d.fc), y: vData.map(d => d.lp),
+                    text: vData.map(d => d.gene), mode: 'markers',
+                    marker: { color: vData.map(d => d.color), size: 6, opacity: 0.8 },
                     hovertemplate: '<b>%{text}</b><br>Log2FC: %{x:.2f}<br>-Log10 P: %{y:.2f}<extra></extra>'
-                };
-                const volLayout = {
-                    title: { text: 'Volcano Plot: Brain TMT', font: {size: 14, color: '#333'} },
-                    xaxis: { title: 'Log2 Fold Change', zeroline: true, zerolinecolor: '#999' },
+                }], {
+                    title: { text: 'Volcano Plot: Brain TMT', font: {size: 13} },
+                    xaxis: { title: 'Log2 Fold Change', zeroline: true },
                     yaxis: { title: '-Log10 p-value' },
                     margin: { l: 50, r: 20, t: 40, b: 40 },
                     hovermode: 'closest'
-                };
-                Plotly.newPlot('plotly-volcano', [volTrace], volLayout, {displayModeBar: false});
+                }, {displayModeBar: false});
 
-                // 5. Interactivity: Click Bar -> Highlight Volcano
-                plotShap.on('plotly_click', function(data) {
-                    const clickedGene = data.points[0].y;
-                    const d = volcanoData.find(v => v.gene === clickedGene);
+                // Interaction
+                document.getElementById('plot-shap').on('plotly_click', (data) => {
+                    const gene = data.points[0].y;
+                    const d = vData.find(v => v.gene === gene);
                     if (d) {
-                        Plotly.relayout('plotly-volcano', {
+                        Plotly.relayout('plot-volcano', {
                             annotations: [{
-                                x: d.logFC, y: d.negLogP, xref: 'x', yref: 'y',
-                                text: `<b>${d.gene}</b>`,
+                                x: d.fc, y: d.lp, xref: 'x', yref: 'y', text: `<b>${d.gene}</b>`,
                                 showarrow: true, arrowhead: 2, ax: 40, ay: -40,
-                                font: { size: 14, color: '#fff' }, bgcolor: '#333', borderpad: 4
+                                font: { color: '#fff' }, bgcolor: '#333', borderpad: 4
                             }]
                         });
                     }
                 });
 
-                // Finalize UI
-                loaderShap.style.display = 'none';
-                loaderVolcano.style.display = 'none';
-                plotShap.style.visibility = 'visible';
-                plotVolcano.style.visibility = 'visible';
+                sShap.style.display = 'none'; sVol.style.display = 'none';
 
             } catch (err) {
                 console.error(err);
-                loaderShap.style.display = 'none';
-                loaderVolcano.style.display = 'none';
-                errShap.style.display = 'block';
-                errVolcano.style.display = 'block';
-                errShap.innerHTML = `<strong>Error:</strong> ${err.message}`;
-                errVolcano.innerHTML = `<strong>Error:</strong> Failed to render visualization.`;
+                mShap.innerHTML = `<span style="color:#d9534f">Error: ${err.message}</span>`;
+                mVol.innerHTML = `<span style="color:#d9534f">Check Console for details</span>`;
+                document.querySelectorAll('.spinner').forEach(s => s.style.display = 'none');
             }
         }
         window.onload = updatePlots;
