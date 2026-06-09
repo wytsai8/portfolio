@@ -47,65 +47,62 @@
             const mShap = document.getElementById('msg-shap'); const mVol = document.getElementById('msg-volcano');
             sShap.style.display = 'flex'; sVol.style.display = 'flex';
             try {
-                if (tissue !== 'Brain' || platform !== 'TMT') throw new Error("Data coming soon. Select Brain + TMT.");
+                if (tissue !== 'Brain' || platform !== 'TMT') throw new Error("Real data is only available for Brain Tissue + TMT.");
                 const [resTMT, resSHAP] = await Promise.all([fetch('TMT_brain.txt'), fetch('SHAP_TMT_brain.txt')]);
                 if (!resTMT.ok || !resSHAP.ok) throw new Error("Data files missing on server.");
                 const txtTMT = await resTMT.text(); const txtSHAP = await resSHAP.text();
+
+                const cUp = '#cc3300'; const cDown = '#1b5e20'; const cNS = '#b0b0b0';
 
                 // 1. Parse Volcano Data
                 const linesTMT = txtTMT.split(/\r?\n/).filter(l => l.trim());
                 const headTMT = linesTMT[0].split('\t');
                 const gIdx = headTMT.findIndex(h => h.toLowerCase().includes('gene'));
-                const uIdx = headTMT.findIndex(h => h.toLowerCase().includes('uniprot'));
                 const lIdx = headTMT.findIndex(h => h.toLowerCase().includes('logfc'));
                 const pIdx = headTMT.findIndex(h => h.toLowerCase().includes('p.value') || h.toLowerCase().includes('pvalue'));
                 
-                let vData = []; let u2g = {}; let g2c = {};
+                let vData = []; let g2c = {};
                 linesTMT.slice(1).forEach(line => {
                     const c = line.split('\t');
                     const fc = parseFloat(c[lIdx]); const p = parseFloat(c[pIdx]);
                     if (!isNaN(fc) && !isNaN(p)) {
-                        const gene = c[gIdx]?.trim() || "Unknown"; const uni = c[uIdx]?.trim() || "";
-                        let color = '#bdbdbd';
+                        const gene = c[gIdx]?.trim() || "Unknown";
+                        let color = cNS;
                         if (-Math.log10(p) > 1.3) {
-                            if (fc > 0.1) color = '#d32f2f';
-                            else if (fc < -0.1) color = '#388e3c';
+                            if (fc > 0.1) color = cUp;
+                            else if (fc < -0.1) color = cDown;
                         }
                         vData.push({ gene, fc, lp: -Math.log10(p), color });
-                        if (uni) u2g[uni] = gene; g2c[gene] = color;
+                        g2c[gene] = color;
                     }
                 });
 
-                // 2. Parse SHAP Data (mean absolute)
+                // 2. Parse New SHAP Data (Already calculated)
                 const linesSHAP = txtSHAP.split(/\r?\n/).filter(l => l.trim());
-                const headers = linesSHAP[0].trim().split('\t'); // Should be proteins
-                
-                let shapFeatureData = [];
-                // Process columns (proteins)
-                for (let j = 0; j < headers.length; j++) {
-                    let sumAbs = 0; let count = 0;
-                    for (let i = 1; i < linesSHAP.length; i++) {
-                        const c = linesSHAP[i].split('\t');
-                        // Data rows may have index in first col, try both idx and idx+1
-                        const val = parseFloat(c[j]) || parseFloat(c[j+1]); 
-                        if (!isNaN(val)) { sumAbs += Math.abs(val); count++; }
+                // Expecting columns: gene, mean(|SHAP value|)
+                let shapResults = [];
+                linesSHAP.slice(1).forEach(line => {
+                    const c = line.split('\t');
+                    if (c.length >= 2) {
+                        const gene = c[0].trim();
+                        const val = parseFloat(c[1]);
+                        if (!isNaN(val)) {
+                            shapResults.push({ gene, val, color: g2c[gene] || cNS });
+                        }
                     }
-                    const protein = headers[j].trim();
-                    const gene = u2g[protein] || protein;
-                    if (count > 0) shapFeatureData.push({ gene, val: sumAbs/count, color: g2c[gene] || '#bdbdbd' });
-                }
-                shapFeatureData.sort((a, b) => b.val - a.val);
+                });
+                shapResults.sort((a, b) => b.val - a.val);
 
                 // 3. Render Bar Plot
-                const top15 = shapFeatureData.slice(0, 15);
+                const topN = shapResults.slice(0, 15);
                 Plotly.newPlot('plot-shap', [{
-                    x: top15.map(d => d.val).reverse(), y: top15.map(d => d.gene).reverse(),
-                    type: 'bar', orientation: 'h', marker: { color: top15.map(d => d.color).reverse() },
+                    x: topN.map(d => d.val).reverse(), y: topN.map(d => d.gene).reverse(),
+                    type: 'bar', orientation: 'h', marker: { color: topN.map(d => d.color).reverse() },
                     hovertemplate: '<b>%{y}</b><extra></extra>'
                 }], {
-                    title: { text: 'Overall Feature Importance Based on SHAP Values', font: {size: 12} },
+                    title: { text: 'Overall Feature Importance Based on SHAP Values', font: {size: 13, color: '#333'} },
                     xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f' },
-                    yaxis: { automargin: true }, margin: { l: 80, r: 20, t: 40, b: 40 }, plot_bgcolor: 'white'
+                    yaxis: { automargin: true }, margin: { l: 90, r: 30, t: 50, b: 50 }, plot_bgcolor: 'white'
                 }, {displayModeBar: false});
 
                 // 4. Render Volcano Plot
@@ -114,20 +111,20 @@
                     mode: 'markers', marker: { color: vData.map(d => d.color), size: 6, opacity: 0.8 },
                     hovertemplate: '<b>%{text}</b><br>Log2FC: %{x:.2f}<br>-Log10 P: %{y:.2f}<extra></extra>'
                 }], {
-                    title: { text: 'Volcano Plot: Brain TMT', font: {size: 13} },
-                    xaxis: { title: 'Log2 Fold Change', zeroline: true }, yaxis: { title: '-Log10 p-value' },
-                    margin: { l: 50, r: 20, t: 40, b: 40 }, hovermode: 'closest'
+                    title: { text: 'Volcano Plot: Brain TMT', font: {size: 14} },
+                    xaxis: { title: 'Log2 Fold Change', zeroline: true, zerolinecolor: '#999' },
+                    yaxis: { title: '-Log10 p-value' },
+                    margin: { l: 50, r: 20, t: 50, b: 50 }, hovermode: 'closest'
                 }, {displayModeBar: false});
 
-                // Click link
                 document.getElementById('plot-shap').on('plotly_click', (data) => {
                     const g = data.points[0].y; const d = vData.find(v => v.gene === g);
                     if (d) Plotly.relayout('plot-volcano', { annotations: [{ x: d.fc, y: d.lp, xref: 'x', yref: 'y', text: `<b>${d.gene}</b>`, showarrow: true, arrowhead: 2, ax: 40, ay: -40, font: { color: '#fff' }, bgcolor: '#333', borderpad: 4 }] });
                 });
                 sShap.style.display = 'none'; sVol.style.display = 'none';
             } catch (err) {
-                mShap.innerHTML = `<span style="color:#d9534f">Error: ${err.message}</span>`;
-                console.error(err);
+                mShap.innerHTML = `<span style="color:#d32f2f">Error: ${err.message}</span>`;
+                sVol.style.display = 'none'; console.error(err);
             }
         }
         window.onload = updatePlots;
