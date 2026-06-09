@@ -45,6 +45,10 @@
                 <div class="plot-card"><div id="status-volcano" class="status-overlay"><div class="spinner"></div><div id="msg-volcano">Loading...</div></div><div id="plot-volcano" class="plot-container"></div></div>
             </div>
         </div>
+
+        <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid #eee;">
+            <img src="AD biomarkers.png" alt="AD Biomarkers Overview" style="width: 100%; max-width: 1000px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.06);">
+        </div>
     </div>
     <script>
         async function updatePlots() {
@@ -56,6 +60,11 @@
             sShap.style.display = 'flex'; sVol.style.display = 'flex';
 
             try {
+                // Specific error messages for missing combinations
+                if ((tissue === 'Brain' && platform === 'PEA') || (tissue === 'CSF' && platform === 'LFQ')) {
+                    throw new Error("沒這筆資料");
+                }
+
                 // Determine Volcano File
                 let vFile = "";
                 if (tissue==='Brain' && platform==='TMT') vFile = 'TMT_brain.txt';
