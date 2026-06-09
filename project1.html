@@ -41,31 +41,43 @@
                 <div><label style="font-size: 0.8rem; font-weight: 700; color: #666; display: block; margin-bottom: 5px;">MODEL</label><select id="sel-model" class="custom-select" onchange="updatePlots()"><option value="RF">Random Forest</option><option value="LR">Logistic Regression</option></select></div>
             </div>
             <div class="plots-grid">
-                <div class="plot-card"><div id="status-shap" class="status-overlay"><div class="spinner"></div><div id="msg-shap">Loading...</div></div><div id="plot-shap" class="plot-container"></div></div>
-                <div class="plot-card"><div id="status-volcano" class="status-overlay"><div class="spinner"></div><div id="msg-volcano">Loading...</div></div><div id="plot-volcano" class="plot-container"></div></div>
+                <div class="plot-card"><div id="status-shap" class="status-overlay"><div class="spinner" id="spin-shap"></div><div id="msg-shap">Loading...</div></div><div id="plot-shap" class="plot-container"></div></div>
+                <div class="plot-card"><div id="status-volcano" class="status-overlay"><div class="spinner" id="spin-vol"></div><div id="msg-volcano">Loading...</div></div><div id="plot-volcano" class="plot-container"></div></div>
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid #eee;">
-            <img src="AD biomarkers.png" alt="AD Biomarkers Overview" style="width: 100%; max-width: 1000px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.06);">
+        <div style="margin-top: 80px; padding-top: 40px; border-top: 1px solid #eee; text-align: left;">
+            <h2 style="font-family: 'Montserrat', sans-serif; color: #333; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700;">Well-known AD biomarkers</h2>
+            <div style="text-align: center;">
+                <img src="AD biomarkers.png" alt="AD Biomarkers Overview" style="width: 100%; max-width: 800px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            </div>
         </div>
     </div>
     <script>
         async function updatePlots() {
             const tissue = document.getElementById('sel-tissue').value;
             const platform = document.getElementById('sel-platform').value;
-            const model = document.getElementById('sel-model').value;
             const sShap = document.getElementById('status-shap'); const sVol = document.getElementById('status-volcano');
             const mShap = document.getElementById('msg-shap'); const mVol = document.getElementById('msg-volcano');
+            const spinS = document.getElementById('spin-shap'); const spinV = document.getElementById('spin-vol');
+            const pShap = document.getElementById('plot-shap'); const pVol = document.getElementById('plot-volcano');
+
+            // Reset UI
             sShap.style.display = 'flex'; sVol.style.display = 'flex';
+            spinS.style.display = 'block'; spinV.style.display = 'block';
+            pShap.style.visibility = 'hidden'; pVol.style.visibility = 'hidden';
+
+            // Check for specific missing data combinations
+            if ((tissue === 'Brain' && platform === 'PEA') || (tissue === 'CSF' && platform === 'LFQ')) {
+                spinS.style.display = 'none'; spinV.style.display = 'none';
+                mShap.innerText = "This data is not available.";
+                mVol.innerText = "This data is not available.";
+                return;
+            }
+
+            mShap.innerText = "Loading data..."; mVol.innerText = "Loading data...";
 
             try {
-                // Specific error messages for missing combinations
-                if ((tissue === 'Brain' && platform === 'PEA') || (tissue === 'CSF' && platform === 'LFQ')) {
-                    throw new Error("沒這筆資料");
-                }
-
-                // Determine Volcano File
                 let vFile = "";
                 if (tissue==='Brain' && platform==='TMT') vFile = 'TMT_brain.txt';
                 else if (tissue==='Brain' && platform==='LFQ') vFile = 'LFQ_brain.txt';
@@ -74,19 +86,17 @@
 
                 if (!vFile) throw new Error("Data for this combination is not yet available.");
 
-                // Fetch Files (Only TMT Brain has real SHAP for now)
                 let fetchTasks = [fetch(vFile)];
                 if (tissue==='Brain' && platform==='TMT') fetchTasks.push(fetch('SHAP_TMT_brain.txt'));
                 
                 const responses = await Promise.all(fetchTasks);
-                if (!responses[0].ok) throw new Error(`Could not load ${vFile}`);
+                if (!responses[0].ok) throw new Error("Data file missing on server.");
 
                 const txtTMT = await responses[0].text();
                 let txtSHAP = (responses[1] && responses[1].ok) ? await responses[1].text() : null;
 
                 const cUp = '#1565c0'; const cDown = '#2e7d32'; const cNS = '#bdbdbd';
 
-                // 1. Parse Volcano Data
                 const linesTMT = txtTMT.split(/\r?\n/).filter(l => l.trim());
                 const headTMT = linesTMT[0].split('\t');
                 const gIdx = headTMT.findIndex(h => h.toLowerCase().includes('gene'));
@@ -105,7 +115,6 @@
                     }
                 });
 
-                // 2. Parse SHAP Data if available
                 let shapResults = [];
                 if (txtSHAP) {
                     const linesSHAP = txtSHAP.split(/\r?\n/).filter(l => l.trim());
@@ -119,7 +128,6 @@
                     shapResults.sort((a, b) => b.val - a.val);
                 }
 
-                // 3. Render Plots
                 if (shapResults.length > 0) {
                     const topN = shapResults.slice(0, 15);
                     Plotly.newPlot('plot-shap', [{
@@ -131,9 +139,10 @@
                         xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f' },
                         yaxis: { automargin: true }, margin: { l: 80, r: 20, t: 40, b: 40 }, plot_bgcolor: 'white'
                     }, {displayModeBar: false});
-                    sShap.style.display = 'none';
+                    sShap.style.display = 'none'; pShap.style.visibility = 'visible';
                 } else {
-                    mShap.innerText = "SHAP data for this panel is currently being calculated.";
+                    spinS.style.display = 'none';
+                    mShap.innerText = "SHAP data for this panel is coming soon.";
                 }
 
                 Plotly.newPlot('plot-volcano', [{
@@ -146,17 +155,16 @@
                     yaxis: { title: '-Log10 p-value' },
                     margin: { l: 50, r: 20, t: 40, b: 40 }, hovermode: 'closest'
                 }, {displayModeBar: false});
-                sVol.style.display = 'none';
+                sVol.style.display = 'none'; pVol.style.visibility = 'visible';
 
-                // Interaction
                 document.getElementById('plot-shap').on('plotly_click', (data) => {
                     const g = data.points[0].y; const d = vData.find(v => v.gene === g);
                     if (d) Plotly.relayout('plot-volcano', { annotations: [{ x: d.fc, y: d.lp, xref: 'x', yref: 'y', text: `<b>${d.gene}</b>`, showarrow: true, arrowhead: 2, ax: 40, ay: -40, font: { color: '#fff' }, bgcolor: '#333', borderpad: 4 }] });
                 });
 
             } catch (err) {
-                mShap.innerText = err.message; mVol.innerText = "Check dataset selection.";
-                console.error(err);
+                spinS.style.display = 'none'; spinV.style.display = 'none';
+                mShap.innerText = err.message; mVol.innerText = "Data error.";
             }
         }
         window.onload = updatePlots;
