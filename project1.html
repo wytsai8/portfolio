@@ -220,39 +220,41 @@
             spinShap.style.display = 'block';
             spinVolcano.style.display = 'block';
 
-            // Combined Plotly Logic (Bar Plot & Volcano Plot with Interactivity)
             try {
                 if (tissue === 'Brain' && platform === 'TMT') {
                     // Fetch real data
-                    console.log("Fetching TMT_brain.txt...");
-                    const response = await fetch('TMT_brain.txt');
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    const data = await response.text();
-                    console.log("Data fetched successfully. Parsing...");
+                    console.log("Fetching TMT_brain.txt and SHAP_TMT_brain.txt...");
+                    const [resTMT, resSHAP] = await Promise.all([
+                        fetch('TMT_brain.txt'),
+                        fetch('SHAP_TMT_brain.txt')
+                    ]);
                     
-                    // Use regex to handle both \n and \r\n line endings correctly
-                    const rows = data.split(/\r?\n/).filter(row => row.trim().length > 0);
+                    if (!resTMT.ok || !resSHAP.ok) throw new Error("HTTP error fetching data files!");
                     
-                    if (rows.length < 2) {
-                        throw new Error("File seems empty or could not be split into rows.");
-                    }
-
-                    // Find header indices dynamically
-                    const headers = rows[0].split('\t');
-                    const geneIdx = headers.findIndex(h => h.trim().toLowerCase() === 'gene name' || h.trim().toLowerCase() === 'gene' || h.trim() === 'symbol');
-                    const logFCIdx = headers.findIndex(h => h.trim().toLowerCase() === 'logfc' || h.trim().toLowerCase() === 'log2fc');
-                    const pValIdx = headers.findIndex(h => h.trim().toLowerCase() === 'p.value' || h.trim().toLowerCase() === 'pvalue');
+                    const dataTMT = await resTMT.text();
+                    const dataSHAP = await resSHAP.text();
+                    
+                    // Parse TMT_brain.txt
+                    const rowsTMT = dataTMT.split(/\r?\n/).filter(row => row.trim().length > 0);
+                    const headersTMT = rowsTMT[0].split('\t');
+                    const geneIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'gene name' || h.trim().toLowerCase() === 'gene' || h.trim().toLowerCase() === 'symbol');
+                    const uniIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'uniprot id' || h.trim().toLowerCase() === 'uniprot');
+                    const logFCIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'logfc' || h.trim().toLowerCase() === 'log2fc');
+                    const pValIdx = headersTMT.findIndex(h => h.trim().toLowerCase() === 'p.value' || h.trim().toLowerCase() === 'pvalue');
 
                     const gIdx = geneIdx > -1 ? geneIdx : 0;
+                    const uIdx = uniIdx > -1 ? uniIdx : 1;
                     const lIdx = logFCIdx > -1 ? logFCIdx : 2;
                     const pIdx = pValIdx > -1 ? pValIdx : 3;
 
                     let volcanoData = [];
+                    let uniprotToGene = {};
                     
-                    for (let i = 1; i < rows.length; i++) {
-                        const cols = rows[i].split('\t');
+                    for (let i = 1; i < rowsTMT.length; i++) {
+                        const cols = rowsTMT[i].split('\t');
                         if (cols.length > Math.max(lIdx, pIdx)) {
                             const gene = cols[gIdx];
+                            const uniprot = cols[uIdx];
                             const logFC = parseFloat(cols[lIdx]);
                             const pValue = parseFloat(cols[pIdx]);
                             
@@ -263,62 +265,85 @@
                                 else if (negLogP > 1.3 && logFC < -0.1) color = '#b5ead7';
                                 
                                 volcanoData.push({ gene, logFC, negLogP, color });
+                                if (uniprot) uniprotToGene[uniprot] = gene;
                             }
                         }
                     }
 
-                    console.log(`Parsed ${volcanoData.length} valid data points.`);
+                    // Parse SHAP_TMT_brain.txt
+                    const rowsSHAP = dataSHAP.split(/\r?\n/).filter(row => row.trim().length > 0);
+                    const headersSHAP = rowsSHAP[0].split('\t').slice(1);
+
+                    let shapSums = new Array(headersSHAP.length).fill(0);
+                    let rowCount = 0;
+                    for (let i = 1; i < rowsSHAP.length; i++) {
+                        const cols = rowsSHAP[i].split('\t').slice(1);
+                        if (cols.length === headersSHAP.length) {
+                            for (let j = 0; j < cols.length; j++) {
+                                shapSums[j] += Math.abs(parseFloat(cols[j]));
+                            }
+                            rowCount++;
+                        }
+                    }
+
+                    let shapFeatures = [];
+                    for (let j = 0; j < headersSHAP.length; j++) {
+                        let uniprot = headersSHAP[j].trim();
+                        let gene = uniprotToGene[uniprot] || uniprot; 
+                        shapFeatures.push({
+                            gene: gene,
+                            meanShap: shapSums[j] / rowCount
+                        });
+                    }
+                    // Sort descending by SHAP value
+                    shapFeatures.sort((a, b) => b.meanShap - a.meanShap);
 
                     spinShap.style.display = 'none';
                     spinVolcano.style.display = 'none';
                     shapCard.style.display = 'block';
                     volcanoCard.style.display = 'block';
 
-                    if (volcanoData.length === 0) {
+                    if (volcanoData.length === 0 || shapFeatures.length === 0) {
                         shapCard.innerHTML = `<div style="padding: 20px; color: #d9534f;">Error parsing data.</div>`;
                         volcanoCard.innerHTML = `<div style="padding: 20px; color: #d9534f;">Error parsing data.</div>`;
                         return;
                     }
 
-                    // Prepare Volcano Plot Arrays
+                    // Render Bar Plot (Real SHAP Data)
+                    const topGenes = shapFeatures.slice(0, 15);
+                    const barX_genes = topGenes.map(d => d.gene); // For vertical, no need to reverse
+                    const barY_vals = topGenes.map(d => d.meanShap);
+                    
+                    shapCard.innerHTML = `<div id="plotly-shap" style="width: 100%; height: 350px;"></div>`;
+                    const barTrace = {
+                        x: barX_genes,
+                        y: barY_vals,
+                        type: 'bar',
+                        marker: { color: '#ff0052' },
+                        hovertemplate: '<b>%{x}</b><br>mean(|SHAP value|): %{y:.4f}<extra></extra>' 
+                    };
+                    const barLayout = {
+                        title: { text: 'summary barplot feature, Random Forest', font: {size: 13, color: '#333'} },
+                        margin: { l: 60, r: 20, t: 40, b: 60 },
+                        xaxis: { 
+                            title: '',
+                            tickangle: -45 // Angle labels if they are long
+                        },
+                        yaxis: { 
+                            title: 'mean(|SHAP value|)', 
+                            zeroline: false,
+                            tickformat: '.3f' 
+                        },
+                        plot_bgcolor: 'white'
+                    };
+                    Plotly.newPlot('plotly-shap', [barTrace], barLayout, {displayModeBar: false});
+
+                    // Render Volcano Plot
                     const vX = volcanoData.map(d => d.logFC);
                     const vY = volcanoData.map(d => d.negLogP);
                     const vText = volcanoData.map(d => d.gene);
                     const vColor = volcanoData.map(d => d.color);
 
-                    // Extract top 15 genes by significance for the Bar Plot (simulating RF Importance)
-                    const sortedData = [...volcanoData].sort((a, b) => b.negLogP - a.negLogP);
-                    const topGenes = sortedData.slice(0, 15); // Highest significance first
-                    
-                    const barX_genes = topGenes.map(d => d.gene);
-                    // Simulate SHAP mean(|SHAP value|) descending
-                    const barY_vals = topGenes.map((d, i) => 0.15 - (i * 0.008) - Math.random() * 0.002); 
-                    const barColor = '#ff0052'; // Uniform SHAP red/pink color
-
-                    // 1. Render Bar Plot (Top Predictors)
-                    shapCard.innerHTML = `<div id="plotly-shap" style="width: 100%; height: 350px;"></div>`;   
-                    const barTrace = {
-                        x: barY_vals,
-                        y: barX_genes,
-                        type: 'bar',
-                        orientation: 'h',
-                        marker: { color: '#ff0052' }, // Uniform red/pink
-                        hovertemplate: '<b>%{y}</b><extra></extra>'
-                    };
-                    const barLayout = {
-                        title: { text: 'summary barplot feature, Random Forest', font: {size: 13, color: '#333'} },
-                        margin: { l: 80, r: 20, t: 40, b: 60 },
-                        xaxis: { 
-                            title: 'mean(|SHAP value|)', 
-                            zeroline: false,
-                            tickformat: '.3f'
-                        },
-                        yaxis: { title: '' },
-                        plot_bgcolor: 'white'
-                    };
-                    Plotly.newPlot('plotly-shap', [barTrace], barLayout, {displayModeBar: false});
-
-                    // 2. Render Volcano Plot
                     volcanoCard.innerHTML = `<div id="plotly-volcano" style="width: 100%; height: 350px;"></div>`;
                     const volTrace = {
                         x: vX,
@@ -338,11 +363,9 @@
                     };
                     Plotly.newPlot('plotly-volcano', [volTrace], volLayout, {displayModeBar: false});
 
-                    // 3. Add Interactivity: Click Bar -> Highlight Volcano
+                    // Add Interactivity
                     document.getElementById('plotly-shap').on('plotly_click', function(data) {
-                        const clickedGene = data.points[0].y; // For horizontal bar, gene is on Y axis
-
-                        // Find gene in volcano data
+                        const clickedGene = data.points[0].y; // Gene name is on the Y axis for horizontal bar plots
                         const geneData = volcanoData.find(d => d.gene === clickedGene);
                         if (geneData) {
                             const updateLayout = {
@@ -372,7 +395,7 @@
                     });
 
                 } else {
-                    // Fallback simulated plot for combinations without real files yet
+                    // Fallback
                     setTimeout(() => {
                         spinShap.style.display = 'none';
                         spinVolcano.style.display = 'none';
@@ -380,36 +403,21 @@
                         volcanoCard.style.display = 'block';
                         
                         shapCard.innerHTML = `<div style="padding: 20px; color: #b85c5c;">⚠️ No real dataset provided for ${tissue} + ${platform}.<br>Select Brain Tissue + TMT to see the interactive charts.</div>`;
-                        volcanoCard.innerHTML = `
-                            <div style="color: #5a6496; font-weight: 800; font-size: 1.2rem; margin-bottom: 5px;">Expression Alignment</div>
-                            <div style="font-size: 0.9rem; color: #888; margin-bottom: 20px;">[ ${tissue} | ${platform} ] Simulated Data</div>
-                            <div style="padding: 20px; background: #fffcfc; border: 1px dashed #ffb7b2; border-radius: 10px; font-size: 0.9rem; color: #b85c5c;">
-                                ⚠️ No real dataset provided for ${tissue} + ${platform}.<br>Please upload corresponding .txt files to enable interactivity for this combination.
-                            </div>
-                        `;
+                        volcanoCard.innerHTML = `<div style="padding: 20px; color: #b85c5c;">⚠️ No real dataset provided for ${tissue} + ${platform}.</div>`;
                     }, 600);
                 }
             } catch (err) {
-                // Handle CORS errors (when opened via file://) or 404 errors
                 console.error("Plot Error:", err);
                 spinShap.style.display = 'none';
                 spinVolcano.style.display = 'none';
                 shapCard.style.display = 'block';
                 volcanoCard.style.display = 'block';
                 
-                let errorMsg = err.message || "Unknown error";
-                
-                shapCard.innerHTML = `<div style="padding: 20px; color: #d9534f; text-align: center;"><strong>Error loading data:</strong><br>${errorMsg}<br><br>Make sure TMT_brain.txt is uploaded to GitHub.</div>`;
-                volcanoCard.innerHTML = `
-                    <div style="color: #5a6496; font-weight: 800; font-size: 1.2rem; margin-bottom: 5px;">Expression Alignment</div>
-                    <div style="padding: 20px; background: #fff3f3; border: 1px dashed #d9534f; border-radius: 10px; font-size: 0.9rem; color: #d9534f;">
-                        <strong>Error loading data:</strong><br>${errorMsg}<br><br>Make sure TMT_brain.txt is uploaded to GitHub.
-                    </div>
-                `;
+                shapCard.innerHTML = `<div style="padding: 20px; color: #d9534f; text-align: center;"><strong>Error loading data:</strong><br>${err.message}<br><br>Make sure TMT_brain.txt and SHAP_TMT_brain.txt are uploaded to GitHub.</div>`;
+                volcanoCard.innerHTML = `<div style="padding: 20px; color: #d9534f; text-align: center;"><strong>Error loading data:</strong><br>${err.message}</div>`;
             }
         }
 
-        // Initialize on load
         window.onload = updatePlots;
     </script>
 </body>
