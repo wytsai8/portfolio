@@ -10,12 +10,14 @@
         body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; color: #4a4a4a; margin: 0; padding: 40px; }
         .container { max-width: 1200px; margin: 0 auto; background: white; padding: 50px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         h1 { font-family: 'Montserrat', sans-serif; color: #333; margin-bottom: 10px; }
-        .back-btn { display: inline-block; margin-bottom: 30px; text-decoration: none; color: #3a7a6a; font-weight: 600; }
+        .back-btn { display: inline-block; margin-bottom: 30px; text-decoration: none; color: #3a7a6a; font-weight: 600; transition: color 0.3s; }
+        .back-btn:hover { color: #222; }
         .dashboard-container { margin-top: 40px; background: #fafbfc; border: 1px solid #eef0f5; border-radius: 20px; padding: 30px; }
         .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .custom-select { padding: 12px; border-radius: 10px; border: 1px solid #ddd; width: 100%; font-size: 0.95rem; }
         .plots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        .plot-card { background: white; border-radius: 15px; border: 1px solid #eee; padding: 15px; min-height: 420px; position: relative; }
+        @media (max-width: 1000px) { .plots-grid { grid-template-columns: 1fr; } }
+        .plot-card { background: white; border-radius: 15px; border: 1px solid #eee; padding: 15px; min-height: 420px; position: relative; display: flex; flex-direction: column; }
         .plot-container { width: 100%; height: 380px; }
         .status-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 5; flex-direction: column; text-align: center; padding: 20px; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3a7a6a; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
@@ -52,9 +54,10 @@
                 if (!resTMT.ok || !resSHAP.ok) throw new Error("Data files missing on server.");
                 const txtTMT = await resTMT.text(); const txtSHAP = await resSHAP.text();
 
-                const cUp = '#cc3300'; const cDown = '#1b5e20'; const cNS = '#b0b0b0';
+                // Darker Colors for Directionality
+                const cUp = '#d32f2f'; const cDown = '#388e3c'; const cNS = '#bdbdbd';
 
-                // 1. Parse Volcano Data
+                // 1. Parse Volcano Data (No significance threshold)
                 const linesTMT = txtTMT.split(/\r?\n/).filter(l => l.trim());
                 const headTMT = linesTMT[0].split('\t');
                 const gIdx = headTMT.findIndex(h => h.toLowerCase().includes('gene'));
@@ -65,21 +68,17 @@
                 linesTMT.slice(1).forEach(line => {
                     const c = line.split('\t');
                     const fc = parseFloat(c[lIdx]); const p = parseFloat(c[pIdx]);
-                    if (!isNaN(fc) && !isNaN(p)) {
+                    if (!isNaN(fc)) {
                         const gene = c[gIdx]?.trim() || "Unknown";
-                        let color = cNS;
-                        if (-Math.log10(p) > 1.3) {
-                            if (fc > 0.1) color = cUp;
-                            else if (fc < -0.1) color = cDown;
-                        }
-                        vData.push({ gene, fc, lp: -Math.log10(p), color });
+                        // Color purely based on LogFC direction (Up/Down)
+                        let color = fc > 0 ? cUp : (fc < 0 ? cDown : cNS);
+                        vData.push({ gene, fc, lp: -Math.log10(p || 1), color });
                         g2c[gene] = color;
                     }
                 });
 
-                // 2. Parse New SHAP Data (Already calculated)
+                // 2. Parse SHAP Data (Directly use pre-calculated values)
                 const linesSHAP = txtSHAP.split(/\r?\n/).filter(l => l.trim());
-                // Expecting columns: gene, mean(|SHAP value|)
                 let shapResults = [];
                 linesSHAP.slice(1).forEach(line => {
                     const c = line.split('\t');
@@ -105,10 +104,10 @@
                     yaxis: { automargin: true }, margin: { l: 90, r: 30, t: 50, b: 50 }, plot_bgcolor: 'white'
                 }, {displayModeBar: false});
 
-                // 4. Render Volcano Plot
+                // 4. Render Volcano Plot (Removed significance lines/filtering)
                 Plotly.newPlot('plot-volcano', [{
                     x: vData.map(d => d.fc), y: vData.map(d => d.lp), text: vData.map(d => d.gene),
-                    mode: 'markers', marker: { color: vData.map(d => d.color), size: 6, opacity: 0.8 },
+                    mode: 'markers', marker: { color: vData.map(d => d.color), size: 6, opacity: 0.7 },
                     hovertemplate: '<b>%{text}</b><br>Log2FC: %{x:.2f}<br>-Log10 P: %{y:.2f}<extra></extra>'
                 }], {
                     title: { text: 'Volcano Plot: Brain TMT', font: {size: 14} },
