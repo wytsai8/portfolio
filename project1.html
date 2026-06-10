@@ -25,11 +25,27 @@
         .status-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 5; flex-direction: column; text-align: center; padding: 20px; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3a7a6a; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .pathway-container { margin-top: 40px; background: white; border-radius: 15px; border: 1px solid #eee; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        .pathway-title { font-size: 1.1rem; font-weight: 700; color: #333; margin-bottom: 20px; border-bottom: 2px solid #9c27b0; display: inline-block; padding-bottom: 5px; }
-        .pathway-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .pathway-item { background: #fafbfc; padding: 15px 20px; border-radius: 10px; border-left: 4px solid #9c27b0; font-size: 0.95rem; color: #555; display: flex; align-items: center; }
-        .pathway-item strong { margin-right: 10px; color: #222; }
+        .pathway-container { margin-top: 40px; background: #fff; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+        .pathway-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 2px solid #3a7a6a; padding-bottom: 15px; }
+        .pathway-header h3 { margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.5rem; color: #333; }
+        .pathway-section-title { font-size: 1.1rem; font-weight: 700; color: #3a7a6a; margin: 30px 0 20px; display: flex; align-items: center; gap: 10px; }
+        .pathway-section-title::before { content: ""; display: inline-block; width: 4px; height: 20px; background: #3a7a6a; border-radius: 2px; }
+        
+        .pathway-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .pathway-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; }
+        .pathway-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); border-color: #3a7a6a; }
+        .pathway-card::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #3a7a6a; opacity: 0.1; }
+        .pathway-card.novel::after { background: #9c27b0; }
+        .pathway-card.novel:hover { border-color: #9c27b0; }
+        
+        .card-gene { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 800; color: #222; display: flex; justify-content: space-between; align-items: center; }
+        .card-tag { font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-est { background: #e0f2f1; color: #00695c; }
+        .tag-novel { background: #f3e5f5; color: #7b1fa2; }
+        
+        .card-role { font-size: 0.9rem; color: #666; font-style: italic; line-height: 1.4; }
+        .card-relevance { font-size: 0.95rem; color: #444; line-height: 1.5; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-top: auto; }
+        .card-label { font-size: 0.75rem; font-weight: 700; color: #999; margin-bottom: 4px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -76,10 +92,12 @@
             </div>
             
             <div class="pathway-container">
-                <div id="pathway-title" class="pathway-title">Pathway Enrichment Analysis</div>
-                <ul class="pathway-list" id="pathway-list">
-                    <!-- Dynamic pathway items will be injected here -->
-                </ul>
+                <div class="pathway-header">
+                    <h3>Biomarker & Pathway Insights</h3>
+                </div>
+                <div id="pathway-content">
+                    <!-- Dynamic pathway content will be injected here -->
+                </div>
             </div>
         </div>
     </div>
@@ -231,53 +249,58 @@
                     if (d) Plotly.relayout('plot-volcano', { annotations: [{ x: d.fc, y: d.lp, xref: 'x', yref: 'y', text: `<b>${g}</b>`, showarrow: true, arrowhead: 2, ax: 40, ay: -40, font: { color: '#fff' }, bgcolor: '#333', borderpad: 4 }] });
                 });
 
-                // Pathway Enrichment Analysis Update
-                const pTitle = document.getElementById('pathway-title');
-                const pList = document.getElementById('pathway-list');
-                pTitle.innerText = `Enriched Pathways for ${tissue} ${platform} (${model})`;
-                
-                // Dynamic Pathway Data Mapping (Placeholder)
-                const pathwayDataMap = {
-                    'Brain_TMT_RF': [
-                        { name: 'Alzheimer\'s disease pathway', pval: '1.2e-08' },
-                        { name: 'Neuroactive ligand-receptor interaction', pval: '3.4e-06' },
-                        { name: 'Synaptic vesicle cycle', pval: '8.9e-05' },
-                        { name: 'Oxidative phosphorylation', pval: '2.3e-04' }
-                    ],
-                    'Brain_TMT_LR': [
-                        { name: 'GABAergic synapse', pval: '4.7e-04' },
-                        { name: 'Glutamatergic synapse', pval: '6.2e-04' },
-                        { name: 'Retrograde endocannabinoid signaling', pval: '1.1e-03' }
-                    ],
-                    'Brain_LFQ_RF': [
-                        { name: 'Metabolic pathways', pval: '5.1e-05' },
-                        { name: 'Proteasome', pval: '7.8e-05' },
-                        { name: 'Prion disease', pval: '9.2e-04' }
-                    ],
-                    'Brain_LFQ_LR': [
-                        { name: 'Spliceosome', pval: '2.5e-04' },
-                        { name: 'RNA transport', pval: '8.1e-04' }
-                    ],
-                    'CSF_TMT_RF': [
-                        { name: 'Complement and coagulation cascades', pval: '1.5e-07' },
-                        { name: 'ECM-receptor interaction', pval: '4.2e-05' },
-                        { name: 'Focal adhesion', pval: '1.8e-04' }
-                    ],
-                    'default': [
-                        { name: 'Pathways coming soon', pval: 'N/A' }
-                    ]
-                };
-                
-                const configKey = `${tissue}_${platform}_${model}`;
-                const activePathways = pathwayDataMap[configKey] || pathwayDataMap['default'];
-                
-                pList.innerHTML = '';
-                activePathways.forEach(pw => {
-                    const li = document.createElement('li');
-                    li.className = 'pathway-item';
-                    li.innerHTML = `<strong>${pw.name}</strong> <span>(p = ${pw.pval})</span>`;
-                    pList.appendChild(li);
-                });
+                // Load and display Pathways/Biomarkers from pathway.txt
+                const pathwayResp = await fetch('pathway.txt');
+                if (pathwayResp.ok) {
+                    const pathwayTxt = await pathwayResp.text();
+                    const lines = pathwayTxt.split(/\r?\n/).filter(l => l.trim());
+                    
+                    let established = [];
+                    let novel = [];
+                    let currentSection = "";
+
+                    lines.forEach(line => {
+                        if (line.includes("Established AD Biomarkers")) {
+                            currentSection = "established";
+                        } else if (line.includes("Novel Candidate Biomarkers")) {
+                            currentSection = "novel";
+                        } else if (line.includes("Gene\t")) {
+                            // Skip header
+                        } else {
+                            const parts = line.split('\t');
+                            if (parts.length >= 3) {
+                                const item = { gene: parts[0], role: parts[1], relevance: parts[2] };
+                                if (currentSection === "established") established.push(item);
+                                else if (currentSection === "novel") novel.push(item);
+                            }
+                        }
+                    });
+
+                    const pContent = document.getElementById('pathway-content');
+                    pContent.innerHTML = `
+                        <div class="pathway-section-title">Established AD Biomarkers / Known Proteins</div>
+                        <div class="pathway-grid">
+                            ${established.map(item => `
+                                <div class="pathway-card">
+                                    <div class="card-gene">${item.gene} <span class="card-tag tag-est">Validated</span></div>
+                                    <div class="card-role"><div class="card-label">Biological Role</div>${item.role}</div>
+                                    <div class="card-relevance"><div class="card-label">AD Relevance</div>${item.relevance}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="pathway-section-title">Novel Candidate Biomarkers Identified</div>
+                        <div class="pathway-grid">
+                            ${novel.map(item => `
+                                <div class="pathway-card novel">
+                                    <div class="card-gene">${item.gene} <span class="card-tag tag-novel">Novel</span></div>
+                                    <div class="card-role"><div class="card-label">Biological Function</div>${item.role}</div>
+                                    <div class="card-relevance"><div class="card-label">Potential AD Link</div>${item.relevance}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
 
             } catch (err) {
                 spinS.style.display = 'none'; spinV.style.display = 'none';

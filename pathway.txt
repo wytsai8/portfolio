@@ -1,0 +1,15 @@
+Established AD Biomarkers / Known AD-associated Proteins
+Gene	Biological Role	AD Relevance
+APP	Amyloid precursor protein	Source of Aβ plaques
+GFAP	Astrocyte activation marker	Neuroinflammation, reactive astrocytes
+VGF	Neurosecretory protein	Synaptic function and cognitive decline
+HSPB1	Heat shock protein	Cellular stress response
+ICAM1	Cell adhesion molecule	Neurovascular dysfunction and inflammation
+
+
+Novel Candidate Biomarkers Identified
+Gene	Biological Function	Potential AD Link
+LDHB	Lactate metabolism	Brain energy metabolism dysfunction
+PGK1	Glycolysis	Impaired glucose utilization
+SOD1	Oxidative stress defense	Reactive oxygen species regulation
+PPIA	Protein folding / chaperone activity	Protein aggregation and neurodegeneration
