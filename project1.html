@@ -176,30 +176,39 @@
                     linesSHAP.slice(1).forEach(line => {
                         const c = line.split('\t');
                         if (c.length >= 2) {
-                            const gene = c[0].trim(); const val = parseFloat(c[1]);
-                            if (!isNaN(val)) shapResults.push({ gene, val, color: g2c[gene] || cNS });
+                            const gene = c[0].trim();
+                            const val = parseFloat(c[1]);
+                            if (!isNaN(val)) {
+                                // Find color from vData mapping, using case-insensitive match for robustness
+                                const match = Object.keys(g2c).find(k => k.toLowerCase() === gene.toLowerCase());
+                                shapResults.push({ gene, val, color: match ? g2c[match] : cNS });
+                            }
                         }
                     });
+                    // Sort descending for the array, so reverse() in Plotly puts highest at the top
                     shapResults.sort((a, b) => b.val - a.val);
                 }
 
                 if (shapResults.length > 0) {
                     Plotly.newPlot('plot-shap', [{
-                        x: shapResults.map(d => d.val).reverse(), y: shapResults.map(d => d.gene).reverse(),
-                        type: 'bar', orientation: 'h', marker: { color: shapResults.map(d => d.color).reverse() },
-                        hovertemplate: '<b>%{y}</b><extra></extra>'
+                        x: shapResults.map(d => d.val).reverse(),
+                        y: shapResults.map(d => d.gene).reverse(),
+                        type: 'bar',
+                        orientation: 'h',
+                        marker: { color: shapResults.map(d => d.color).reverse() },
+                        hovertemplate: '<b>%{y}</b><br>SHAP: %{x:.4f}<extra></extra>'
                     }], {
-                        title: { text: `Protein Panel: ${shapResults.length} Proteins (SHAP Importance)`, font: {size: 13, weight: 'bold'} },
-                        xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f' },
-                        yaxis: { automargin: true, type: 'category' }, 
-                        margin: { l: 80, r: 20, t: 50, b: 60 }, 
+                        title: { text: `Protein Panel: ${shapResults.length} Key Proteins (SHAP Importance)`, font: {size: 14, weight: 'bold'} },
+                        xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f', gridcolor: '#f0f0f0' },
+                        yaxis: { automargin: true, type: 'category', gridcolor: '#f0f0f0' }, 
+                        margin: { l: 120, r: 30, t: 60, b: 60 }, 
                         plot_bgcolor: 'white',
-                        height: Math.max(400, shapResults.length * 25 + 100)
+                        height: Math.max(450, shapResults.length * 30 + 100)
                     }, {displayModeBar: false});
                     sShap.style.display = 'none'; pShap.style.visibility = 'visible';
                 } else {
                     spinS.style.display = 'none';
-                    mShap.innerText = "SHAP data for this panel is coming soon.";
+                    mShap.innerText = "SHAP data for this panel is currently being processed.";
                 }
 
                 const volcanoAnnotations = shapResults.map((s, idx) => {
