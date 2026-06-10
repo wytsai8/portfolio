@@ -109,6 +109,8 @@
                 if (tissue==='Brain' && platform==='TMT') {
                     const shapFile = model === 'RF' ? 'SHAP_TMT_brain_RF.txt' : 'SHAP_TMT_brain_LR.txt';
                     fetchTasks.push(fetch(shapFile));
+                } else if (tissue==='Brain' && platform==='LFQ' && model==='RF') {
+                    fetchTasks.push(fetch('SHAP_LFQ_brain_RF.txt'));
                 }
                 
                 const responses = await Promise.all(fetchTasks);
@@ -159,7 +161,7 @@
                         title: { text: `Protein Panel: ${shapResults.length} Proteins (SHAP Importance)`, font: {size: 13, weight: 'bold'} },
                         xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f' },
                         yaxis: { automargin: true, type: 'category' }, 
-                        margin: { l: 80, r: 20, t: 50, b: 40 }, 
+                        margin: { l: 80, r: 20, t: 50, b: 60 }, 
                         plot_bgcolor: 'white',
                         height: Math.max(400, shapResults.length * 25 + 100)
                     }, {displayModeBar: false});
@@ -172,9 +174,9 @@
                 const volcanoAnnotations = shapResults.map((s, idx) => {
                     const d = vData.find(v => v.gene === s.gene);
                     if (d) {
-                        // Strategic offsets to spread out labels
-                        const axVal = idx % 2 === 0 ? 50 : -50;
-                        const ayVal = -30 - (idx % 5) * 15; // Vary height to avoid horizontal overlap
+                        const isUp = d.fc > 0;
+                        const axVal = isUp ? (40 + (idx % 3) * 25) : (-40 - (idx % 3) * 25);
+                        const ayVal = -20 - (idx % 7) * 18;
                         return {
                             x: d.fc, y: d.lp, xref: 'x', yref: 'y',
                             text: `<b>${s.gene}</b>`,
