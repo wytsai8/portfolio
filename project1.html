@@ -50,7 +50,7 @@
                 
                 <p style="margin-bottom: 20px;">We also observed that protein expression profiles in brain tissue are strongly influenced by regional and cellular heterogeneity, resulting in lower reproducibility across cohorts and proteomics platforms. In contrast, CSF more comprehensively reflects the overall physiological state of the central nervous system and exhibited greater consistency and overlap of biomarker panels across different analytical platforms and machine learning models. These findings suggest that CSF may represent a more robust source for Alzheimer's disease biomarker discovery and validation. Overall, our study demonstrates the value of combining large-scale proteomics integration with machine learning approaches to advance AD biomarker discovery, early diagnosis, and precision medicine applications.</p>
                 
-                <p style="margin-bottom: 20px;">The sections below provide the protein biomarker panels identified across different tissue types (brain tissue and CSF), proteomics platforms, and machine learning models, together with their corresponding differential protein abundance (DEP) and pathway enrichment analysis results. For a more detailed description of the methodology, results, and biological interpretation, please refer to:</p>
+                <p style="margin-bottom: 20px; color: #9c27b0; font-weight: 500;">The sections below provide the protein biomarker panels identified across different tissue types (brain tissue and CSF), proteomics platforms, and machine learning models, together with their corresponding differential protein abundance (DEP) and pathway enrichment analysis results.</p>
                 
                 <div style="background: #f0f4f3; padding: 25px; border-radius: 12px; border-left: 5px solid #3a7a6a; font-style: italic; color: #333;">
                     <strong>Tsai WY</strong>, Giesbertz P, Breimann S, Lichtenthaler S, Frishman D. Multi-Platform Integration of Brain and CSF Proteomes Reveals Biomarker Panels for Alzheimer’s Disease. <strong>Briefings in Bioinformatics</strong>. 2026;27(1).
@@ -75,6 +75,7 @@
         async function updatePlots() {
             const tissue = document.getElementById('sel-tissue').value;
             const platform = document.getElementById('sel-platform').value;
+            const model = document.getElementById('sel-model').value;
             const sShap = document.getElementById('status-shap'); const sVol = document.getElementById('status-volcano');
             const mShap = document.getElementById('msg-shap'); const mVol = document.getElementById('msg-volcano');
             const spinS = document.getElementById('spin-shap'); const spinV = document.getElementById('spin-vol');
@@ -105,7 +106,10 @@
                 if (!vFile) throw new Error("Data for this combination is not yet available.");
 
                 let fetchTasks = [fetch(vFile)];
-                if (tissue==='Brain' && platform==='TMT') fetchTasks.push(fetch('SHAP_TMT_brain.txt'));
+                if (tissue==='Brain' && platform==='TMT') {
+                    const shapFile = model === 'RF' ? 'SHAP_TMT_brain_RF.txt' : 'SHAP_TMT_brain_LR.txt';
+                    fetchTasks.push(fetch(shapFile));
+                }
                 
                 const responses = await Promise.all(fetchTasks);
                 if (!responses[0].ok) throw new Error("Data file missing on server.");
