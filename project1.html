@@ -198,7 +198,7 @@
                         marker: { color: shapResults.map(d => d.color).reverse() },
                         hovertemplate: '<b>%{y}</b><br>SHAP: %{x:.4f}<extra></extra>'
                     }], {
-                        title: { text: `Protein Panel: ${shapResults.length} Key Proteins (SHAP Importance)`, font: {size: 14, weight: 'bold'} },
+                        title: { text: `${shapResults.length} Features (SHAP Importance)`, font: {size: 14, weight: 'bold'} },
                         xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f', gridcolor: '#f0f0f0' },
                         yaxis: { automargin: true, type: 'category', gridcolor: '#f0f0f0' }, 
                         margin: { l: 120, r: 30, t: 60, b: 60 }, 
