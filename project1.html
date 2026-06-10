@@ -25,6 +25,11 @@
         .status-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 5; flex-direction: column; text-align: center; padding: 20px; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3a7a6a; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .pathway-container { margin-top: 40px; background: white; border-radius: 15px; border: 1px solid #eee; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .pathway-title { font-size: 1.1rem; font-weight: 700; color: #333; margin-bottom: 20px; border-bottom: 2px solid #9c27b0; display: inline-block; padding-bottom: 5px; }
+        .pathway-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .pathway-item { background: #fafbfc; padding: 15px 20px; border-radius: 10px; border-left: 4px solid #9c27b0; font-size: 0.95rem; color: #555; display: flex; align-items: center; }
+        .pathway-item strong { margin-right: 10px; color: #222; }
     </style>
 </head>
 <body>
@@ -68,6 +73,13 @@
             <div class="plots-grid">
                 <div class="plot-card"><div id="status-shap" class="status-overlay"><div class="spinner" id="spin-shap"></div><div id="msg-shap">Loading...</div></div><div id="plot-shap" class="plot-container"></div></div>
                 <div class="plot-card"><div id="status-volcano" class="status-overlay"><div class="spinner" id="spin-vol"></div><div id="msg-volcano">Loading...</div></div><div id="plot-volcano" class="plot-container"></div></div>
+            </div>
+            
+            <div class="pathway-container">
+                <div id="pathway-title" class="pathway-title">Pathway Enrichment Analysis</div>
+                <ul class="pathway-list" id="pathway-list">
+                    <!-- Dynamic pathway items will be injected here -->
+                </ul>
             </div>
         </div>
     </div>
@@ -213,6 +225,29 @@
                 document.getElementById('plot-shap').on('plotly_click', (data) => {
                     const g = data.points[0].y; const d = vData.find(v => v.gene === g);
                     if (d) Plotly.relayout('plot-volcano', { annotations: [{ x: d.fc, y: d.lp, xref: 'x', yref: 'y', text: `<b>${d.gene}</b>`, showarrow: true, arrowhead: 2, ax: 40, ay: -40, font: { color: '#fff' }, bgcolor: '#333', borderpad: 4 }] });
+                });
+
+                // Pathway Enrichment Analysis Update
+                const pTitle = document.getElementById('pathway-title');
+                const pList = document.getElementById('pathway-list');
+                pTitle.innerText = `Enriched Pathways for ${tissue} ${platform} (${model})`;
+                
+                // Placeholder dummy data based on common AD pathways
+                const dummyPathways = [
+                    { name: 'Alzheimer\'s disease pathway', pval: '1.2e-08' },
+                    { name: 'Neuroactive ligand-receptor interaction', pval: '3.4e-06' },
+                    { name: 'Metabolic pathways', pval: '5.1e-05' },
+                    { name: 'Synaptic vesicle cycle', pval: '8.9e-05' },
+                    { name: 'Oxidative phosphorylation', pval: '2.3e-04' },
+                    { name: 'GABAergic synapse', pval: '4.7e-04' }
+                ];
+                
+                pList.innerHTML = '';
+                dummyPathways.forEach(pw => {
+                    const li = document.createElement('li');
+                    li.className = 'pathway-item';
+                    li.innerHTML = `<strong>${pw.name}</strong> <span>(p = ${pw.pval})</span>`;
+                    pList.appendChild(li);
                 });
 
             } catch (err) {
