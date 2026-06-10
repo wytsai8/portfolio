@@ -151,15 +151,17 @@
                 }
 
                 if (shapResults.length > 0) {
-                    const topN = shapResults.slice(0, 15);
                     Plotly.newPlot('plot-shap', [{
-                        x: topN.map(d => d.val).reverse(), y: topN.map(d => d.gene).reverse(),
-                        type: 'bar', orientation: 'h', marker: { color: topN.map(d => d.color).reverse() },
+                        x: shapResults.map(d => d.val).reverse(), y: shapResults.map(d => d.gene).reverse(),
+                        type: 'bar', orientation: 'h', marker: { color: shapResults.map(d => d.color).reverse() },
                         hovertemplate: '<b>%{y}</b><extra></extra>'
                     }], {
-                        title: { text: 'Overall Feature Importance Based on SHAP Values', font: {size: 11} },
+                        title: { text: `Protein Panel: ${shapResults.length} Proteins (SHAP Importance)`, font: {size: 13, weight: 'bold'} },
                         xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f' },
-                        yaxis: { automargin: true }, margin: { l: 80, r: 20, t: 40, b: 40 }, plot_bgcolor: 'white'
+                        yaxis: { automargin: true, type: 'category' }, 
+                        margin: { l: 80, r: 20, t: 50, b: 40 }, 
+                        plot_bgcolor: 'white',
+                        height: Math.max(400, shapResults.length * 25 + 100)
                     }, {displayModeBar: false});
                     sShap.style.display = 'none'; pShap.style.visibility = 'visible';
                 } else {
