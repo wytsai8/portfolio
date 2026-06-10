@@ -25,6 +25,7 @@
         .status-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 5; flex-direction: column; text-align: center; padding: 20px; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3a7a6a; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .pathway-container { margin-top: 40px; background: #fff; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
         .pathway-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 2px solid #3a7a6a; padding-bottom: 15px; }
         .pathway-header h3 { margin: 0; font-family: 'Montserrat', sans-serif; font-size: 1.5rem; color: #333; }
@@ -140,8 +141,8 @@
                     fetchTasks.push(fetch(model === 'RF' ? 'SHAP_TMT_brain_RF.txt' : 'SHAP_TMT_brain_LR.txt'));
                 } else if (tissue==='Brain' && platform==='LFQ') {
                     fetchTasks.push(fetch(model === 'RF' ? 'SHAP_LFQ_brain_RF.txt' : 'SHAP_LFQ_brain_LR.txt'));
-                } else if (tissue==='CSF' && platform==='TMT' && model==='RF') {
-                    fetchTasks.push(fetch('SHAP_TMT_CSF_RF.txt'));
+                } else if (tissue==='CSF' && platform==='TMT') {
+                    fetchTasks.push(fetch(model === 'RF' ? 'SHAP_TMT_CSF_RF.txt' : 'SHAP_TMT_CSF_LR.txt'));
                 }
                 
                 const responses = await Promise.all(fetchTasks);
@@ -179,13 +180,11 @@
                             const gene = c[0].trim();
                             const val = parseFloat(c[1]);
                             if (!isNaN(val)) {
-                                // Find color from vData mapping, using case-insensitive match for robustness
                                 const match = Object.keys(g2c).find(k => k.toLowerCase() === gene.toLowerCase());
                                 shapResults.push({ gene, val, color: match ? g2c[match] : cNS });
                             }
                         }
                     });
-                    // Sort descending for the array, so reverse() in Plotly puts highest at the top
                     shapResults.sort((a, b) => b.val - a.val);
                 }
 
@@ -198,7 +197,7 @@
                         marker: { color: shapResults.map(d => d.color).reverse() },
                         hovertemplate: '<b>%{y}</b><br>SHAP: %{x:.4f}<extra></extra>'
                     }], {
-                        title: { text: `${shapResults.length} Features (SHAP Importance)`, font: {size: 14, weight: 'bold'} },
+                        title: { text: `Protein Panel: ${shapResults.length} Proteins (SHAP Importance)`, font: {size: 14, weight: 'bold'} },
                         xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f', gridcolor: '#f0f0f0' },
                         yaxis: { automargin: true, type: 'category', gridcolor: '#f0f0f0' }, 
                         margin: { l: 120, r: 30, t: 60, b: 60 }, 
@@ -208,11 +207,10 @@
                     sShap.style.display = 'none'; pShap.style.visibility = 'visible';
                 } else {
                     spinS.style.display = 'none';
-                    mShap.innerText = "SHAP data for this panel is currently being processed.";
+                    mShap.innerText = "SHAP data for this panel is coming soon.";
                 }
 
                 const volcanoAnnotations = shapResults.map((s, idx) => {
-                    // Handle comma-separated gene names in SHAP files (e.g., PABPC1L2A,PABPC1L2B)
                     const sGenes = s.gene.split(',').map(g => g.trim());
                     const d = vData.find(v => sGenes.some(sg => v.gene.includes(sg)));
                     if (d) {
@@ -222,17 +220,9 @@
                         return {
                             x: d.fc, y: d.lp, xref: 'x', yref: 'y',
                             text: `<b>${s.gene}</b>`,
-                            showarrow: true,
-                            arrowhead: 1,
-                            arrowsize: 1,
-                            arrowwidth: 0.8,
-                            arrowcolor: '#888',
-                            ax: axVal,
-                            ay: ayVal,
-                            font: { size: 11, color: '#222' },
-                            bgcolor: 'rgba(255, 255, 255, 0.95)',
-                            bordercolor: '#ccc',
-                            borderpad: 3
+                            showarrow: true, arrowhead: 1, arrowsize: 1, arrowwidth: 0.8, arrowcolor: '#888',
+                            ax: axVal, ay: ayVal, font: { size: 11, color: '#222' },
+                            bgcolor: 'rgba(255, 255, 255, 0.95)', bordercolor: '#ccc', borderpad: 3
                         };
                     }
                     return null;
@@ -246,8 +236,7 @@
                     xaxis: { title: 'Log2 Fold Change', zeroline: true, zerolinecolor: '#999' },
                     yaxis: { title: '-Log10 p-value' },
                     margin: { l: 50, r: 20, t: 40, b: 40 }, hovermode: 'closest',
-                    annotations: volcanoAnnotations,
-                    plot_bgcolor: 'white'
+                    annotations: volcanoAnnotations, plot_bgcolor: 'white'
                 }, {displayModeBar: false});
                 sVol.style.display = 'none'; pVol.style.visibility = 'visible';
 
@@ -263,19 +252,12 @@
                 if (pathwayResp.ok) {
                     const pathwayTxt = await pathwayResp.text();
                     const lines = pathwayTxt.split(/\r?\n/).filter(l => l.trim());
-                    
-                    let established = [];
-                    let novel = [];
-                    let currentSection = "";
-
+                    let established = []; let novel = []; let currentSection = "";
                     lines.forEach(line => {
-                        if (line.includes("Established AD Biomarkers")) {
-                            currentSection = "established";
-                        } else if (line.includes("Novel Candidate Biomarkers")) {
-                            currentSection = "novel";
-                        } else if (line.includes("Gene\t")) {
-                            // Skip header
-                        } else {
+                        if (line.includes("Established AD Biomarkers")) currentSection = "established";
+                        else if (line.includes("Novel Candidate Biomarkers")) currentSection = "novel";
+                        else if (line.includes("Gene\t")) {}
+                        else {
                             const parts = line.split('\t');
                             if (parts.length >= 3) {
                                 const item = { gene: parts[0], role: parts[1], relevance: parts[2] };
@@ -284,7 +266,6 @@
                             }
                         }
                     });
-
                     const pContent = document.getElementById('pathway-content');
                     pContent.innerHTML = `
                         <div class="pathway-section-title">Established AD Biomarkers / Known Proteins</div>
@@ -297,7 +278,6 @@
                                 </div>
                             `).join('')}
                         </div>
-                        
                         <div class="pathway-section-title">Novel Candidate Biomarkers Identified</div>
                         <div class="pathway-grid">
                             ${novel.map(item => `
