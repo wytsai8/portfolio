@@ -107,10 +107,11 @@
 
                 let fetchTasks = [fetch(vFile)];
                 if (tissue==='Brain' && platform==='TMT') {
-                    const shapFile = model === 'RF' ? 'SHAP_TMT_brain_RF.txt' : 'SHAP_TMT_brain_LR.txt';
-                    fetchTasks.push(fetch(shapFile));
-                } else if (tissue==='Brain' && platform==='LFQ' && model==='RF') {
-                    fetchTasks.push(fetch('SHAP_LFQ_brain_RF.txt'));
+                    fetchTasks.push(fetch(model === 'RF' ? 'SHAP_TMT_brain_RF.txt' : 'SHAP_TMT_brain_LR.txt'));
+                } else if (tissue==='Brain' && platform==='LFQ') {
+                    fetchTasks.push(fetch(model === 'RF' ? 'SHAP_LFQ_brain_RF.txt' : 'SHAP_LFQ_brain_LR.txt'));
+                } else if (tissue==='CSF' && platform==='TMT' && model==='RF') {
+                    fetchTasks.push(fetch('SHAP_TMT_CSF_RF.txt'));
                 }
                 
                 const responses = await Promise.all(fetchTasks);
@@ -175,22 +176,22 @@
                     const d = vData.find(v => v.gene === s.gene);
                     if (d) {
                         const isUp = d.fc > 0;
-                        const axVal = isUp ? (40 + (idx % 3) * 25) : (-40 - (idx % 3) * 25);
-                        const ayVal = -20 - (idx % 7) * 18;
+                        const axVal = isUp ? (60 + (idx % 4) * 35) : (-60 - (idx % 4) * 35);
+                        const ayVal = -30 - (idx % 9) * 25;
                         return {
                             x: d.fc, y: d.lp, xref: 'x', yref: 'y',
                             text: `<b>${s.gene}</b>`,
                             showarrow: true,
                             arrowhead: 1,
                             arrowsize: 1,
-                            arrowwidth: 0.5,
-                            arrowcolor: '#999',
+                            arrowwidth: 0.8,
+                            arrowcolor: '#888',
                             ax: axVal,
                             ay: ayVal,
-                            font: { size: 11, color: '#333' },
-                            bgcolor: 'rgba(255, 255, 255, 0.9)',
-                            bordercolor: '#eee',
-                            borderpad: 2
+                            font: { size: 11, color: '#222' },
+                            bgcolor: 'rgba(255, 255, 255, 0.95)',
+                            bordercolor: '#ccc',
+                            borderpad: 3
                         };
                     }
                     return null;
