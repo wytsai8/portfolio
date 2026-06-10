@@ -13,8 +13,8 @@
         .back-btn { display: inline-block; margin-bottom: 30px; text-decoration: none; color: #3a7a6a; font-weight: 600; transition: color 0.3s; }
         .back-btn:hover { color: #222; }
         
-        .dashboard-container { margin-top: 40px; background: #fafbfc; border: 1px solid #eef0f5; border-radius: 20px; padding: 30px; }
-        .group-title { font-size: 1rem; font-weight: 800; color: #333; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #3a7a6a; display: inline-block; padding-bottom: 5px; }
+        .dashboard-container { margin-top: 40px; background: #fafbfc; border: 1px solid #eef0f5; border-radius: 20px; padding: 40px; width: 100%; max-width: 1400px; margin-left: auto; margin-right: auto; }
+        .group-title { font-size: 1.2rem; font-weight: 800; color: #333; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 3px solid #3a7a6a; display: inline-block; padding-bottom: 5px; }
         .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .custom-select { padding: 12px; border-radius: 10px; border: 1px solid #ddd; width: 100%; font-size: 0.95rem; }
         .plots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
@@ -169,6 +169,12 @@
                     mShap.innerText = "SHAP data for this panel is coming soon.";
                 }
 
+                const volcanoAnnotations = shapResults.map(s => {
+                    const d = vData.find(v => v.gene === s.gene);
+                    if (d) return { x: d.fc, y: d.lp, xref: 'x', yref: 'y', text: s.gene, showarrow: false, font: { size: 10, color: '#333' }, yanchor: 'bottom', xanchor: 'center' };
+                    return null;
+                }).filter(a => a !== null);
+
                 Plotly.newPlot('plot-volcano', [{
                     x: vData.map(d => d.fc), y: vData.map(d => d.lp), text: vData.map(d => d.gene),
                     mode: 'markers', marker: { color: vData.map(d => d.color), size: 6, opacity: 0.75 },
@@ -177,7 +183,8 @@
                     title: { text: `Volcano Plot: ${tissue} ${platform}`, font: {size: 13} },
                     xaxis: { title: 'Log2 Fold Change', zeroline: true, zerolinecolor: '#999' },
                     yaxis: { title: '-Log10 p-value' },
-                    margin: { l: 50, r: 20, t: 40, b: 40 }, hovermode: 'closest'
+                    margin: { l: 50, r: 20, t: 40, b: 40 }, hovermode: 'closest',
+                    annotations: volcanoAnnotations
                 }, {displayModeBar: false});
                 sVol.style.display = 'none'; pVol.style.visibility = 'visible';
 
