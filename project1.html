@@ -31,8 +31,33 @@
     <div class="container">
         <a href="index.html#works" class="back-btn">← Back to Portfolio</a>
         <h1>Novel Biomarker Discovery for Alzheimer's Disease</h1>
-        <div style="text-align: center; margin: 30px 0;"><img src="AD.png" style="width: 100%; max-width: 1000px; border-radius: 15px;"></div>
         
+        <div style="display: flex; gap: 30px; margin-top: 30px; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 350px; line-height: 1.8; color: #555; font-size: 1.05rem; background: #f8fbfd; padding: 30px; border-radius: 15px; border-left: 5px solid #3a7a6a;">
+                <p style="margin-bottom: 0;"><strong>Objective:</strong> Alzheimer's disease (AD) is a highly heterogeneous neurodegenerative disorder, and currently established biomarkers such as Aβ, Tau, and pTau, while clinically valuable, do not fully capture the complexity of its underlying pathology. To address this challenge, we integrated large-scale proteomics datasets from brain tissue and cerebrospinal fluid (CSF) across multiple studies and analytical platforms. By combining proteomic and clinical data with machine learning approaches, we developed a cross-platform biomarker discovery framework to identify protein panels that more accurately distinguish AD patients from healthy controls. This framework is intended to support laboratory research by accelerating the discovery and prioritization of novel AD biomarkers for downstream experimental validation.</p>
+            </div>
+            <div style="flex: 1.2; min-width: 350px; text-align: center;">
+                <img src="AD biomarkers.png" alt="AD Biomarkers Overview" style="width: 100%; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 40px 0;"><img src="AD.png" style="width: 100%; max-width: 1200px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);"></div>
+        
+        <div style="margin-top: 50px; margin-bottom: 50px;">
+            <h2 style="font-family: 'Montserrat', sans-serif; color: #333; margin-bottom: 25px; font-size: 1.8rem; font-weight: 700; border-bottom: 3px solid #3a7a6a; display: inline-block; padding-bottom: 8px;">Conclusion</h2>
+            <div style="line-height: 1.8; color: #444; font-size: 1.05rem; text-align: justify;">
+                <p style="margin-bottom: 20px;">In this study, we developed a machine learning framework for integrating multi-platform, multi-cohort proteomics datasets and analyzed <strong style="color: #1a73e8;">28 large-scale proteomics cohorts</strong> comprising <strong style="color: #1a73e8;">approximately 3,000 samples</strong> from brain tissue and cerebrospinal fluid (CSF). Using this framework, we successfully identified protein biomarker panels capable of distinguishing Alzheimer's disease (AD) patients from healthy controls. <strong style="color: #1a73e8;">The approach achieved strong predictive performance, with the Area Under the Precision-Recall Curve (AUC-PR) reaching or exceeding 0.9 across multiple independent datasets.</strong> Our results not only validated several well-established AD biomarkers, including <strong>APP, GFAP, VGF, HSPB1, and ICAM1</strong>, but also identified several novel candidate biomarkers, such as <strong>LDHB, PGK1, SOD1, and PPIA</strong>, which have not previously been reported as AD-associated proteins. Furthermore, pathway enrichment analysis revealed that these proteins are involved in biological pathways closely related to AD pathogenesis, highlighting their potential as novel biomarkers that warrant further experimental validation.</p>
+                
+                <p style="margin-bottom: 20px;">We also observed that protein expression profiles in brain tissue are strongly influenced by regional and cellular heterogeneity, resulting in lower reproducibility across cohorts and proteomics platforms. In contrast, CSF more comprehensively reflects the overall physiological state of the central nervous system and exhibited greater consistency and overlap of biomarker panels across different analytical platforms and machine learning models. These findings suggest that CSF may represent a more robust source for Alzheimer's disease biomarker discovery and validation. Overall, our study demonstrates the value of combining large-scale proteomics integration with machine learning approaches to advance AD biomarker discovery, early diagnosis, and precision medicine applications.</p>
+                
+                <p style="margin-bottom: 20px;">The sections below provide the protein biomarker panels identified across different tissue types (brain tissue and CSF), proteomics platforms, and machine learning models, together with their corresponding differential protein abundance (DEP) and pathway enrichment analysis results. For a more detailed description of the methodology, results, and biological interpretation, please refer to:</p>
+                
+                <div style="background: #f0f4f3; padding: 25px; border-radius: 12px; border-left: 5px solid #3a7a6a; font-style: italic; color: #333;">
+                    <strong>Tsai WY</strong>, Giesbertz P, Breimann S, Lichtenthaler S, Frishman D. Multi-Platform Integration of Brain and CSF Proteomes Reveals Biomarker Panels for Alzheimer’s Disease. <strong>Briefings in Bioinformatics</strong>. 2026;27(1).
+                </div>
+            </div>
+        </div>
+
         <div class="dashboard-container">
             <h3 class="group-title">Protein Panels</h3>
             <div class="controls-grid">
@@ -43,13 +68,6 @@
             <div class="plots-grid">
                 <div class="plot-card"><div id="status-shap" class="status-overlay"><div class="spinner" id="spin-shap"></div><div id="msg-shap">Loading...</div></div><div id="plot-shap" class="plot-container"></div></div>
                 <div class="plot-card"><div id="status-volcano" class="status-overlay"><div class="spinner" id="spin-vol"></div><div id="msg-volcano">Loading...</div></div><div id="plot-volcano" class="plot-container"></div></div>
-            </div>
-        </div>
-
-        <div style="margin-top: 80px; padding-top: 40px; border-top: 1px solid #eee; text-align: left;">
-            <h2 style="font-family: 'Montserrat', sans-serif; color: #333; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700;">Well-known AD biomarkers</h2>
-            <div style="text-align: center;">
-                <img src="AD biomarkers.png" alt="AD Biomarkers Overview" style="width: 100%; max-width: 800px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
             </div>
         </div>
     </div>
