@@ -117,13 +117,14 @@
 
                 if (!vFile) throw new Error("Data for this combination is not yet available.");
 
-                let fetchTasks = [fetch(vFile)];
+                const cb = '?v=' + new Date().getTime(); // Cache-buster
+                let fetchTasks = [fetch(vFile + cb)];
                 if (tissue==='Brain' && platform==='TMT') {
-                    fetchTasks.push(fetch(model === 'RF' ? 'SHAP_TMT_brain_RF.txt' : 'SHAP_TMT_brain_LR.txt'));
+                    fetchTasks.push(fetch((model === 'RF' ? 'SHAP_TMT_brain_RF.txt' : 'SHAP_TMT_brain_LR.txt') + cb));
                 } else if (tissue==='Brain' && platform==='LFQ') {
-                    fetchTasks.push(fetch(model === 'RF' ? 'SHAP_LFQ_brain_RF.txt' : 'SHAP_LFQ_brain_LR.txt'));
+                    fetchTasks.push(fetch((model === 'RF' ? 'SHAP_LFQ_brain_RF.txt' : 'SHAP_LFQ_brain_LR.txt') + cb));
                 } else if (tissue==='CSF' && platform==='TMT' && model==='RF') {
-                    fetchTasks.push(fetch('SHAP_TMT_CSF_RF.txt'));
+                    fetchTasks.push(fetch('SHAP_TMT_CSF_RF.txt' + cb));
                 }
                 
                 const responses = await Promise.all(fetchTasks);
