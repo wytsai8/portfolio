@@ -197,7 +197,7 @@
                         type: 'bar',
                         orientation: 'h',
                         marker: { color: shapResults.map(d => d.color).reverse() },
-                        hovertemplate: '<b>%{y}</b><br>SHAP: %{x:.4f}<extra></extra>'
+                        hovertemplate: '<b>%{y}</b><extra></extra>'
                     }], {
                         title: { text: `Protein Panel: ${shapResults.length} Proteins (SHAP Importance)`, font: {size: 14, weight: 'bold'} },
                         xaxis: { title: 'mean(|SHAP value|)', tickformat: '.3f', gridcolor: '#f0f0f0' },
