@@ -1,0 +1,28 @@
+19 Biochemical Blood Parameters
+
+Liver Function
+Alanine Aminotransferase (ALT)
+Albumin (ALB.BCG)
+Protein Metabolism
+Total Protein (TP)
+Globulin (GLO)
+Kidney Function
+Blood Urea Nitrogen (BUN)
+Uric Acid (UA)
+Creatinine (CRE)
+Estimated Glomerular Filtration Rate (eGFR)
+Lipid Profile
+Total Cholesterol (TCH)
+Triglycerides (TG)
+High-Density Lipoprotein Cholesterol (HDL-C)
+Low-Density Lipoprotein Cholesterol (LDL-C)
+Glucose Metabolism
+Glucose (GLU.AC)
+Electrolytes
+Sodium (Na)
+Potassium (K)
+Chloride (Cl)
+Calcium (Ca)
+Iron Metabolism
+Iron (Fe)
+Total Iron Binding Capacity (TIBC)

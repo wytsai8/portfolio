@@ -4,41 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biomedical Signal Analytics | Project Detail</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fc;
-            color: #4a4a4a;
-            margin: 0;
-            padding: 40px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; color: #4a4a4a; margin: 0; padding: 40px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 50px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         h1 { font-family: 'Montserrat', sans-serif; color: #333; margin-bottom: 10px; }
-        .back-btn {
-            display: inline-block; margin-bottom: 30px; text-decoration: none; color: #5a6496; font-weight: 600; transition: color 0.3s;
-        }
+        .back-btn { display: inline-block; margin-bottom: 30px; text-decoration: none; color: #5a6496; font-weight: 600; transition: color 0.3s; }
         .back-btn:hover { color: #222; }
-        .interactive-area {
-            width: 100%;
-            height: 600px;
-            background: #f0f2f8;
-            border: 2px dashed #b5ead7;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #3a7a6a;
-            font-weight: 600;
-            margin-top: 30px;
-        }
+
+        /* Parameters Section */
+        .params-container { margin: 60px 0; background: #fafbfc; border-radius: 25px; padding: 45px; border: 1px solid #eef0f5; }
+        .params-header { margin-bottom: 40px; text-align: center; }
+        .params-header h3 { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; color: #333; margin-bottom: 15px; }
+        .source-badge { display: inline-flex; align-items: center; gap: 8px; background: #e3f2fd; color: #1565c0; padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; margin-bottom: 20px; border: 1px solid #bbdefb; }
+        .source-badge::before { content: "🩸"; font-size: 1.1rem; }
+        
+        .params-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+        .param-card { background: white; padding: 18px 22px; border-radius: 18px; border: 1px solid #eee; display: flex; align-items: center; gap: 15px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: default; }
+        .param-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 30px rgba(90, 100, 150, 0.1); border-color: #5a6496; }
+        .param-icon { width: 42px; height: 42px; background: #f0f2f8; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; transition: background 0.3s; }
+        .param-card:hover .param-icon { background: #e8eaf6; }
+        .param-info { display: flex; flex-direction: column; }
+        .param-name { font-weight: 700; color: #333; font-size: 0.95rem; line-height: 1.2; }
+        .param-cat { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+        .param-card.imaging-pa { border-left: 5px solid #1565c0; } /* Strong Blue */
+        .param-card.imaging-abs { border-left: 5px solid #2e7d32; } /* Strong Green */
+        .param-card.imaging-both { border-left: 5px solid #ef6c00; } /* Strong Orange */
+        .param-card.imaging-other { border-left: 5px solid #bdbdbd; } /* Solid Gray */
+
+        .legend { display: flex; justify-content: center; gap: 25px; margin-top: 40px; flex-wrap: wrap; font-size: 0.85rem; font-weight: 600; color: #666; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -46,8 +43,110 @@
         <a href="index.html#works" class="back-btn">← Back to Portfolio</a>
         <h1>Biomedical Signal Analytics</h1>
         
-        <div style="margin-top: 30px; line-height: 1.8; color: #555; font-size: 1.05rem; background: #f8fbfd; padding: 30px; border-radius: 15px; border-left: 5px solid #5a6496; text-align: justify;">
+        <div style="margin-top: 30px; line-height: 1.8; color: #555; font-size: 1.05rem; background: #f8fbfd; padding: 30px; border-radius: 15px; border-left: 5px solid #1565c0; text-align: justify;">
             <p style="margin-bottom: 0;"><strong>Objective:</strong> Conventional blood biochemical testing requires invasive blood sampling and laboratory analysis, limiting its applicability for continuous monitoring and rapid screening. This study aimed to evaluate the potential of photoacoustic imaging and absorption spectroscopy imaging as non-invasive molecular sensing technologies for biochemical assessment. By extracting time-domain and frequency-domain signal features and integrating statistical modeling approaches, we investigated whether imaging-derived biomarkers could accurately reflect and predict clinically relevant blood biochemical parameters. The ultimate goal was to establish an automated analysis framework that supports the development of portable, non-invasive health monitoring technologies for future clinical applications.</p>
+        </div>
+
+        <!-- 19 Parameters Section -->
+        <div class="params-container">
+            <div class="params-header">
+                <div class="source-badge">Data Source: Blood from Healthy Donors</div>
+                <h3>19 Biochemical Blood Parameters Analyzed</h3>
+                <p style="color: #666; max-width: 800px; margin: 0 auto;">We analyzed the correlation between optical signals and 19 specific biochemical markers, categorized by their biological relevance and sensing technology detection.</p>
+            </div>
+            
+            <div class="params-grid">
+                <!-- Better predicted by Both (Orange) -->
+                <div class="param-card imaging-both">
+                    <div class="param-icon">🧬</div>
+                    <div class="param-info"><span class="param-name">Albumin (ALB.BCG)</span><span class="param-cat">Liver Function</span></div>
+                </div>
+                <div class="param-card imaging-both">
+                    <div class="param-icon">🧂</div>
+                    <div class="param-info"><span class="param-name">Uric Acid (UA)</span><span class="param-cat">Kidney Function</span></div>
+                </div>
+                <div class="param-card imaging-both">
+                    <div class="param-icon">🌊</div>
+                    <div class="param-info"><span class="param-name">Chloride (Cl)</span><span class="param-cat">Electrolytes</span></div>
+                </div>
+
+                <!-- Better predicted by Photoacoustic (Blue) -->
+                <div class="param-card imaging-pa">
+                    <div class="param-icon">🔴</div>
+                    <div class="param-info"><span class="param-name">Low-Density Lipoprotein Cholesterol (LDL-C)</span><span class="param-cat">Lipid Profile</span></div>
+                </div>
+                <div class="param-card imaging-pa">
+                    <div class="param-icon">🧂</div>
+                    <div class="param-info"><span class="param-name">Sodium (Na)</span><span class="param-cat">Electrolytes</span></div>
+                </div>
+                <div class="param-card imaging-pa">
+                    <div class="param-icon">🥚</div>
+                    <div class="param-info"><span class="param-name">Total Cholesterol (TCH)</span><span class="param-cat">Lipid Profile</span></div>
+                </div>
+                <div class="param-card imaging-pa">
+                    <div class="param-icon">🧪</div>
+                    <div class="param-info"><span class="param-name">Creatinine (CRE)</span><span class="param-cat">Kidney Function</span></div>
+                </div>
+
+                <!-- Better predicted by Spectroscopy (Green) -->
+                <div class="param-card imaging-abs">
+                    <div class="param-icon">🟢</div>
+                    <div class="param-info"><span class="param-name">High-Density Lipoprotein Cholesterol (HDL-C)</span><span class="param-cat">Lipid Profile</span></div>
+                </div>
+                <div class="param-card imaging-abs">
+                    <div class="param-icon">🦴</div>
+                    <div class="param-info"><span class="param-name">Calcium (Ca)</span><span class="param-cat">Electrolytes</span></div>
+                </div>
+                <div class="param-card imaging-abs">
+                    <div class="param-icon">🥛</div>
+                    <div class="param-info"><span class="param-name">Total Protein (TP)</span><span class="param-cat">Protein Metabolism</span></div>
+                </div>
+
+                <!-- Other detected parameters (Gray) -->
+                <div class="param-card imaging-other">
+                    <div class="param-icon">🧬</div>
+                    <div class="param-info"><span class="param-name">Alanine Aminotransferase (ALT)</span><span class="param-cat">Liver Function</span></div>
+                </div>
+                <div class="param-card imaging-other">
+                    <div class="param-icon">🛡️</div>
+                    <div class="param-info"><span class="param-name">Globulin (GLO)</span><span class="param-cat">Protein Metabolism</span></div>
+                </div>
+                <div class="param-card imaging-other">
+                    <div class="param-icon">💧</div>
+                    <div class="param-info"><span class="param-name">Blood Urea Nitrogen (BUN)</span><span class="param-cat">Kidney Function</span></div>
+                </div>
+                <div class="param-card imaging-other">
+                    <div class="param-icon">⚙️</div>
+                    <div class="param-info"><span class="param-name">Estimated Glomerular Filtration Rate (eGFR)</span><span class="param-cat">Kidney Function</span></div>
+                </div>
+                <div class="param-card imaging-other">
+                    <div class="param-icon">🥓</div>
+                    <div class="param-info"><span class="param-name">Triglycerides (TG)</span><span class="param-cat">Lipid Profile</span></div>
+                </div>
+                <div class="param-card imaging-other">
+                    <div class="param-icon">🍯</div>
+                    <div class="param-info"><span class="param-name">Glucose (GLU.AC)</span><span class="param-cat">Glucose Metabolism</span></div>
+                </div>
+                <div class="param-card imaging-other">
+                    <div class="param-icon">⚡</div>
+                    <div class="param-info"><span class="param-name">Potassium (K)</span><span class="param-cat">Electrolytes</span></div>
+                </div>
+                <div class="param-card imaging-other">
+                    <div class="param-icon">🩸</div>
+                    <div class="param-info"><span class="param-name">Iron (Fe)</span><span class="param-cat">Iron Metabolism</span></div>
+                </div>
+                <div class="param-card imaging-other">
+                    <div class="param-icon">🧲</div>
+                    <div class="param-info"><span class="param-name">Total Iron Binding Capacity (TIBC)</span><span class="param-cat">Iron Metabolism</span></div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="dot" style="background: #1565c0;"></div> Better predicted by Photoacoustic</div>
+                <div class="legend-item"><div class="dot" style="background: #2e7d32;"></div> Better predicted by Spectroscopy</div>
+                <div class="legend-item"><div class="dot" style="background: #ef6c00;"></div> Better predicted by Both</div>
+                <div class="legend-item"><div class="dot" style="background: #bdbdbd;"></div> Other detected parameters</div>
+            </div>
         </div>
         
         <div style="text-align: center; margin: 40px 0;">
