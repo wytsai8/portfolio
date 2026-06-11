@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wei-Yun Tsai Portfolio</title>
+    <link rel="icon" type="image/png" href="Favicon.png">
     <meta name="description" content="Portfolio of Wei-Yun Tsai, A data-driven professional specializing in machine learning and computational methods for multi-omics, biomedical data analysis, and biomedical signal processing.">
     <meta name="keywords" content="Wei-Yun Tsai, Bioinformatics, Data Science, Machine Learning, Alzheimer's Disease, Biomarkers, Multi-omics, Biomedical Signal Analysis">
     <!-- Google Fonts -->
@@ -206,6 +207,35 @@
             section { padding: 140px 5% 40px; }
             .hero-title { font-size: 2.5rem !important; }
         }
+
+        /* --- Favicon Frame --- */
+        .favicon-frame {
+            position: relative;
+            padding: 80px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            min-height: 80vh;
+        }
+        .favicon-frame::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            /* Use vmin to make it as large as possible while fitting completely on screen */
+            width: 95vmin; 
+            height: 95vmin; 
+            max-width: 1200px; /* Optional cap so it doesn't get absurdly huge on 4k screens */
+            max-height: 1200px;
+            background-image: url('ring.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: -1; 
+            opacity: 0.25; 
+        }
     </style>
 </head>
 <body>
@@ -230,17 +260,17 @@
 
     <div class="horizontal-wrapper">
         <section id="home">
-            <div class="container" style="max-width: 1000px; text-align: center;">
-                <h1 class="hero-title" style="font-size: 3.8rem; line-height: 1.1; margin-bottom: 5px;">
+            <div class="container favicon-frame" style="max-width: 1000px; text-align: center;">
+                <h1 class="hero-title" style="font-size: 3.8rem; line-height: 1.1; margin-bottom: 5px; position: relative; z-index: 2;">
                     Exploring life and the world <br>
                     through data
                 </h1>
                 
-                <h1 class="hero-title" style="font-size: 3.2rem; line-height: 1.1; margin-bottom: 40px; font-weight: 300; color: #666; letter-spacing: -1px;">
+                <h1 class="hero-title" style="font-size: 3.2rem; line-height: 1.1; margin-bottom: 40px; font-weight: 300; color: #666; letter-spacing: -1px; position: relative; z-index: 2;">
                     Translating complexity into <span style="color: var(--accent-pink); font-weight: 400;">insight</span>.
                 </h1>
 
-                <div style="display: inline-block; text-align: left; background: white; padding: 35px 45px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; margin-bottom: 50px;">
+                <div style="display: inline-block; text-align: left; margin-bottom: 50px; position: relative; z-index: 2;">
                     <p style="font-weight: 600; font-size: 1.2rem; color: #333; margin-bottom: 12px; display: flex; align-items: center;">
                         <span style="width: 8px; height: 8px; background: var(--accent-mint); border-radius: 50%; margin-right: 12px;"></span>
                         Machine Learning & Data Science for Biomedical Discovery
@@ -252,7 +282,7 @@
                 </div>
 
                 <br>
-                <a href="#about" class="btn">Explore My Journey →</a>
+                <a href="#about" class="btn" style="position: relative; z-index: 2;">Explore My Journey →</a>
             </div>
         </section>
 

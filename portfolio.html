@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioinformatics UI/UX Portfolio | Macaron Tech Style</title>
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f7f9fc;
+            --text-color: #4a4a4a;
+            --accent-mint: #b5ead7;
+            --accent-lavender: #c7ceea;
+            --accent-pink: #ffb7b2;
+            --accent-yellow: #e2f0cb;
+            --accent-apricot: #ffdac1;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+        }
+
+        /* --- Background Decoration --- */
+        .bg-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: move 20s infinite alternate;
+        }
+
+        /* Blobs now look like soft biological cells */
+        .blob-1 { width: 450px; height: 450px; background: var(--accent-mint); top: -100px; left: -100px; }
+        .blob-2 { width: 550px; height: 550px; background: var(--accent-lavender); bottom: -150px; right: -150px; }
+        .blob-3 { width: 350px; height: 350px; background: var(--accent-pink); top: 50%; left: 80%; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(60px, 120px) scale(1.1); }
+        }
+
+        /* --- Navbar --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-lavender);
+        }
+
+        /* --- Sections --- */
+        section {
+            padding: 100px 10%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Hero --- */
+        #home {
+            text-align: center;
+        }
+
+        .hero-tag {
+            background: var(--accent-mint);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #c7ceea, #ffb7b2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #666;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            background: white;
+            border: 2px solid var(--accent-lavender);
+            color: var(--text-color);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(199, 206, 234, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--accent-lavender);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        /* --- Works --- */
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 5px;
+            background: var(--accent-mint);
+            border-radius: 5px;
+        }
+
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .work-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        .work-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            background: white;
+        }
+
+        .work-img {
+            width: 100%;
+            height: 200px;
+            background: var(--accent-apricot);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* --- About --- */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .skill-tags {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .skill-tag {
+            background: white;
+            border: 1px solid #eee;
+            padding: 8px 15px;
+            border-radius: 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .skill-tag:hover {
+            background: var(--accent-yellow);
+            border-color: var(--accent-yellow);
+        }
+
+        /* --- Experience --- */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-lavender);
+            border-radius: 5px;
+        }
+
+        .timeline-item {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 4px solid var(--accent-mint);
+            border-radius: 50%;
+        }
+
+        .time {
+            font-weight: 700;
+            color: var(--accent-lavender);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* --- Contact --- */
+        .contact-form {
+            background: var(--glass-bg);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--accent-lavender);
+        }
+
+        .submit-btn {
+            background: var(--accent-mint);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            color: #4a4a4a;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(181, 234, 215, 0.5);
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        /* --- Mobile Resp --- */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .about-content { grid-template-columns: 1fr; }
+            nav { padding: 20px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <nav>
+        <a href="#" class="logo">BIO.DESIGN</a>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#works">Portfolio</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="home">
+        <div class="container">
+            <span class="hero-tag">Intersecting Biology & Data</span>
+            <h1 class="hero-title">UI/UX Designer <br>specializing in Bioinformatics</h1>
+            <p class="hero-subtitle">Transforming complex genomic data into intuitive digital experiences.</p>
+            <a href="#about" class="btn">Explore My Journey</a>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-content">
+                <div>
+                    <p>I am a data-driven scientist working on machine learning and computational methods for biomedical data, including multi-omics and biomedical signal analysis.</p>
+                    <p style="margin-top: 15px;">I specialize in transforming complex, high-dimensional biomedical data into actionable insights using statistical and machine learning methods. My work spans biomedical imaging signals, genomics, transcriptomics, proteomics, next-generation sequencing, and clinical datasets.</p>
+                    <p style="margin-top: 15px;">During my PhD, I focused on Alzheimer’s disease biomarker discovery using multi-modal proteomics and clinical data, as well as computational modeling of biomedical imaging signals for biological parameter prediction. I emphasize scalable data processing, model development, and interpretability in collaboration with interdisciplinary research teams.</p>
+                    <p style="margin-top: 15px;">I am particularly interested in applying my expertise in bioinformatics, healthcare analytics, machine learning, and data-driven problem solving in cross-functional environments.</p>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Figma</span>
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">R / Bioconductor</span>
+                        <span class="skill-tag">MATLAB</span>
+                        <span class="skill-tag">Data Visualization</span>
+                        <span class="skill-tag">NGS Analysis</span>
+                        <span class="skill-tag">HTML/CSS/JS</span>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <!-- Bio-themed placeholder -->
+                    <div style="width: 300px; height: 300px; background: white; border-radius: 50%; margin: 0 auto; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 10px solid var(--accent-mint); box-shadow: 0 20px 40px rgba(181, 234, 215, 0.3);">
+                         <img src="Wei-Yun Tsai_photo.jpg" alt="Wei-Yun Tsai" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="works">
+        <div class="container">
+            <h2 class="section-title">Case Studies</h2>
+            <div class="work-grid">
+                <div class="work-card">
+                    <div class="work-img" style="background: var(--accent-lavender);">🧬 <br>Genomic Data Explorer</div>
+                    <h3>Novel Biomarker Discovery for Alzheimer's Disease</h3>
+                    <p>Designed a high-performance web interface for navigating multi-omics datasets with smooth zooming and filtering.</p>
+                </div>
+                <div class="work-card">
+                    <div class="work-img" style="background: var(--accent-mint);">🔬 <br>Protein Structure Viz</div>
+                    <h3>3D Molecular Viewer</h3>
+                    <p>Created a simplified UI for a 3D protein visualization tool, improving researcher efficiency by 40%.</p>
+                </div>
+                <div class="work-card">
+                    <div class="work-img" style="background: var(--accent-apricot);">📊 <br>Pathogen Analytics</div>
+                    <h3>Epidemiology Dashboard</h3>
+                    <p>Developed an interactive tracking map for pathogen spread, focusing on accessibility and real-time updates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience">
+        <div class="container">
+            <h2 class="section-title">Professional Journey</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="time">2024 - Present</span>
+                    <h3>Product Designer @ BioTech Corp</h3>
+                    <p>Leading the UX overhaul of a laboratory information management system (LIMS).</p>
+                </div>
+                <div class="timeline-item">
+                    <span class="time">2022 - 2024</span>
+                    <h3>Bioinformatics Scientist @ Genomics Inst.</h3>
+                    <p>Managed large-scale NGS pipelines while designing internal visualization tools for clinical teams.</p>
+                </div>
+                <div class="timeline-item">
+                    <span class="time">2021 - 2022</span>
+                    <h3>Computational Biology Intern</h3>
+                    <p>Assisted in protein folding simulations and data cleaning for public biological databases.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <h2 class="section-title">Get in Touch</h2>
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <div class="contact-form" style="flex: 2; min-width: 300px;">
+                    <form action="https://formspree.io/f/mlddlppw" method="POST">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" name="name" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" placeholder="your.email@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Message</label>
+                            <textarea name="message" rows="4" placeholder="How can we collaborate?" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+                <div style="flex: 1; min-width: 250px; background: var(--glass-bg); padding: 40px; border-radius: 30px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                    <div style="width: 80px; height: 80px; background: #0077b5; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: white; font-size: 2rem; font-weight: 700;">in</div>
+                    <h3>Professional Network</h3>
+                    <p style="margin: 15px 0 25px;">I welcome new career opportunities and am also open to discussing collaborations, research projects, and data-driven challenges.</p>
+                    <a href="https://www.linkedin.com/in/wei-yun-tsai-202588wyt" target="_blank" class="btn" style="background: #0077b5; color: white; border: none; width: 100%; text-decoration: none; padding: 12px;">Connect on LinkedIn</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Crafted at the Intersection of Biology & Design</p>
+        <p style="font-size: 0.8rem; margin-top: 10px; color: #999;">
+            <a href="https://www.linkedin.com/in/wei-yun-tsai-202588wyt" target="_blank" style="color: inherit; text-decoration: none;">LinkedIn</a> • GitHub • Dribbble
+        </p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
