@@ -143,6 +143,8 @@
                     fetchTasks.push(fetch(model === 'RF' ? 'SHAP_LFQ_brain_RF.txt' : 'SHAP_LFQ_brain_LR.txt'));
                 } else if (tissue==='CSF' && platform==='TMT') {
                     fetchTasks.push(fetch(model === 'RF' ? 'SHAP_TMT_CSF_RF.txt' : 'SHAP_TMT_CSF_LR.txt'));
+                } else if (tissue==='CSF' && platform==='PEA') {
+                    fetchTasks.push(fetch(model === 'RF' ? 'SHAP_PEA_CSF_RF.txt' : 'SHAP_PEA_CSF_LR.txt'));
                 }
                 
                 const responses = await Promise.all(fetchTasks);
